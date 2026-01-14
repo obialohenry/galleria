@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:galleria/config/app_strings.dart';
 import 'package:galleria/model/local/camera_state.dart';
+import 'package:galleria/utils/util_functions.dart';
 
 final availableCamerasProvider =
     AsyncNotifierProvider<AvailableCamerasProvider, List<CameraDescription>>(
@@ -40,10 +43,7 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
 
     _controller = CameraController(cameras[cameraIndex], ResolutionPreset.max);
     await _controller!.initialize();
-    return CameraState(
-      controller: _controller!,
-      cameraIndex: cameraIndex,
-    );
+    return CameraState(controller: _controller!, cameraIndex: cameraIndex);
   }
 
   Future<void> switchCamera() async {
@@ -57,9 +57,16 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
     );
   }
 
-  Future<XFile> takePicture() async {
+  Future<File> takePicture() async {
     final cameraState = state.value!;
     await cameraState.controller.initialize();
-    return await cameraState.controller.takePicture();
+    final XFile xFile = await cameraState.controller.takePicture();
+    final File imageFile = File(xFile.path);
+
+    final success = await UtilFunctions.saveImageToDeviceGallery(file: imageFile);
+    if (!success) {
+      throw Exception(AppStrings.failedToSaveImage);
+    }
+    return imageFile;
   }
 }

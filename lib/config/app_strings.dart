@@ -5,4 +5,5 @@ class AppStrings {
   static const synced = "Synced";
   static const location = "Location";
   static const localPath = "Local Path";
+  static const failedToSaveImage = "Failed to save image to gallery";
 }

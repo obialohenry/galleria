@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,11 +9,18 @@ import 'package:galleria/view/screens/photos/photo_details_screen.dart';
 import 'package:galleria/view_model/cameras_view_model.dart';
 
 // ignore: must_be_immutable
-class TakePhotoScreen extends ConsumerWidget {
-  TakePhotoScreen({super.key});
-  XFile? image;
+class TakePhotoScreen extends ConsumerStatefulWidget {
+  const TakePhotoScreen({super.key});
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TakePhotoScreen> createState() => _TakePhotoScreenState();
+}
+
+class _TakePhotoScreenState extends ConsumerState<TakePhotoScreen> {
+  File? image;
+
+  @override
+  Widget build(BuildContext context) {
     final camerasProvider = ref.watch(cameraControllerProvider);
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
@@ -44,7 +53,9 @@ class TakePhotoScreen extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
+                  image == null
+                      ? SizedBox(height: 45, width: 45)
+                      : GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
@@ -57,7 +68,7 @@ class TakePhotoScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                          image: AssetImage(image?.path ?? "assets/images/daenerys.jpeg"),
+                                image: FileImage(File(image!.path)),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -65,8 +76,13 @@ class TakePhotoScreen extends ConsumerWidget {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      image = await ref.read(cameraControllerProvider.notifier).takePicture();
-                      print("PICTURE: ${image?.path}");
+                      try {
+                        image = await ref.read(cameraControllerProvider.notifier).takePicture();
+                        print("PICTURE: ${image?.path}");
+                        setState(() {});
+                      } catch (e, s) {
+                        print("An error occured $e at\n$s");
+                      }
                     },
                     child: Container(
                       height: 60,
