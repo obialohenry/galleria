@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Galleria',
       debugShowCheckedModeBanner: false,
-      home: const DashboardScreen(),
+      home: DashboardScreen(),
     );
   }
 }

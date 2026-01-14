@@ -1,8 +1,17 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:galleria/model/local/dashboard_state.dart';
 
-// final dashboardViewModel = ChangeNotifierProvider<DashboardViewModel>((ref) {
-//   return DashboardViewModel();
-// });
+final dashboardViewModel = NotifierProvider<DashboardViewModel, DashboardState>(
+  DashboardViewModel.new,
+);
 
-// class DashboardViewModel extends ChangeNotifier {}
+class DashboardViewModel extends Notifier<DashboardState> {
+  @override
+  DashboardState build() {
+    return DashboardState();
+  }
+
+  void changeScreen(int index) {
+    state = state.screenChanged(index);
+  }
+}

@@ -4,8 +4,8 @@ import 'package:galleria/config/app_strings.dart';
 import 'package:galleria/view/components/app_text.dart';
 
 class PhotoDetailsScreen extends StatefulWidget {
-  const PhotoDetailsScreen({super.key});
-
+  const PhotoDetailsScreen({super.key, this.image});
+  final String? image;
   @override
   State<PhotoDetailsScreen> createState() => _PhotoDetailsScreenState();
 }
@@ -20,7 +20,7 @@ class _PhotoDetailsScreenState extends State<PhotoDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(right: 15, top: 15,bottom: 15),
+              padding: const EdgeInsets.only(right: 15, top: 15, bottom: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -33,7 +33,7 @@ class _PhotoDetailsScreenState extends State<PhotoDetailsScreen> {
                         },
                         child: Icon(Icons.arrow_back, color: AppColors.kTextPrimary, size: 30),
                       ),
-                      SizedBox(width: 10,),
+                      SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -62,31 +62,34 @@ class _PhotoDetailsScreenState extends State<PhotoDetailsScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 20,),
+            SizedBox(height: 20),
             Expanded(
               flex: 3,
               child: Container(
-               decoration: BoxDecoration(
-                  image: DecorationImage(image: AssetImage("assets/images/daenerys.jpeg"), fit: BoxFit.cover),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(widget.image ?? "assets/images/daenerys.jpeg"),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    SizedBox(height: 10,),
-                    AppText(text: AppStrings.location,fontWeight: FontWeight.w700,),
-                    SizedBox(height: 5,),
-                    AppText(text: "123 Main Street...",color: AppColors.kTextSecondary,),
-                    SizedBox(height: 10,),
-                    AppText(text: AppStrings.localPath,fontWeight: FontWeight.w700,),
-                    SizedBox(height: 5,),
-                    AppText(text: "/storage/emulated/...",color: AppColors.kTextSecondary,),
-                      ],
-                    ),
-                  ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 10),
+                  AppText(text: AppStrings.location, fontWeight: FontWeight.w700),
+                  SizedBox(height: 5),
+                  AppText(text: "123 Main Street...", color: AppColors.kTextSecondary),
+                  SizedBox(height: 10),
+                  AppText(text: AppStrings.localPath, fontWeight: FontWeight.w700),
+                  SizedBox(height: 5),
+                  AppText(text: "/storage/emulated/...", color: AppColors.kTextSecondary),
+                ],
+              ),
+            ),
           ],
         ),
       ),
