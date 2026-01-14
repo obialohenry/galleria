@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const kBackgroundPrimary = Color(0xffffffff);
-  static const kBackgroundSecondary = Color(0xffF5F7FA);
-  static const kTextPrimary = Color(0xff111827);
-  static const kTextSecondary = Color(0xff6B7280);
-  static const kPrimary = Color(0xff2563EB);
-  static const kPrimaryPressed = Color(0xff1D4ED8);
-  static const kSuccess = Color(0xff16A34A);
-  static const kPending = Color(0xffF59E0B);
-  static const kError = Color(0xffDC2626);
+  static const kBackgroundPrimary = Color(0xff1C352D);
+  static const kBackgroundSecondary = Color(0xFFF5C9B0);
+  static const kTextPrimary = Color(0xFFA6B28B);
+  static const kTextSecondary = Color(0xFFF9F6F3);
+  static const kPrimary = Color(0xFFA6B28B);
+  static const kPrimaryPressed = Color(0xFF000000);
+  static const kSuccess = Color(0xFF3AA37E);
+  static const kPending = Color(0xFFFFC6C0);
+  static const kError = Color(0xFFDC2626); 
 }
