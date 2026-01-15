@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:galleria/config/app_colors.dart';
-import 'package:galleria/config/app_strings.dart';
+import 'package:galleria/src/config.dart';
 import 'package:galleria/view/components/app_text.dart';
 
 class PhotoDetailsScreen extends StatelessWidget {

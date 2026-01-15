@@ -1,12 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:galleria/config/app_colors.dart';
-import 'package:galleria/config/app_strings.dart';
-import 'package:galleria/model/local/photo_model.dart';
+import 'package:galleria/src/config.dart';
+import 'package:galleria/src/model.dart';
+import 'package:galleria/src/screens.dart';
+import 'package:galleria/src/view_model.dart';
 import 'package:galleria/view/components/app_text.dart';
-import 'package:galleria/view/screens/photos/photo_details_screen.dart';
-import 'package:galleria/view_model/photos_view_model.dart';
 
 class PhotosScreen extends ConsumerWidget {
   const PhotosScreen({super.key});

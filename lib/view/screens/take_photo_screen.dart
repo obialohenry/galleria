@@ -2,14 +2,12 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:galleria/config/app_colors.dart';
-import 'package:galleria/config/app_strings.dart';
-import 'package:galleria/model/local/photo_model.dart';
+import 'package:galleria/src/config.dart';
+import 'package:galleria/src/model.dart';
+import 'package:galleria/src/screens.dart';
+import 'package:galleria/src/view_model.dart';
 import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
-import 'package:galleria/view/screens/photos/photo_details_screen.dart';
-import 'package:galleria/view_model/cameras_view_model.dart';
-import 'package:galleria/view_model/photos_view_model.dart';
 import 'package:geolocator/geolocator.dart';
 
 // ignore: must_be_immutable

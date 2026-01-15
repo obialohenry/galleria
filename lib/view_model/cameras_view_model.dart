@@ -59,7 +59,6 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
 
   Future<File> takePicture() async {
     final cameraState = state.value!;
-    await cameraState.controller.initialize();
     final XFile xFile = await cameraState.controller.takePicture();
     final File imageFile = File(xFile.path);
 

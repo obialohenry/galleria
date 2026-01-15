@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:galleria/config/app_colors.dart';
-import 'package:galleria/view/screens/photos/photos_screen.dart';
-import 'package:galleria/view/screens/take_photo_screen.dart';
-import 'package:galleria/view_model/dashboard_view_model.dart';
+import 'package:galleria/src/config.dart';
+import 'package:galleria/src/screens.dart';
+import 'package:galleria/src/view_model.dart';
 
 class DashboardScreen extends ConsumerWidget {
   DashboardScreen({super.key});
