@@ -8,4 +8,5 @@ class AppStrings {
   static const failedToSaveImage = "Failed to save image to gallery";
   static const unknownLocation = "Unknown location";
   static const unknownData = "Unknown Data";
+  static const boxName = "photosBox";
 }

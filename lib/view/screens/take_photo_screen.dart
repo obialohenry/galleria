@@ -18,6 +18,7 @@ class TakePhotoScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final camerasProvider = ref.watch(cameraControllerProvider);
     final photoProvider = ref.watch(photoViewModel);
+    final photosProvider = ref.watch(photosViewModel);
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
@@ -49,7 +50,7 @@ class TakePhotoScreen extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  photoProvider.localPath == null
+                  photoProvider.localPath == null && photosProvider.value!.isEmpty
                       ? SizedBox(height: 45, width: 45)
                       : GestureDetector(
                           onTap: () {
@@ -57,11 +58,24 @@ class TakePhotoScreen extends ConsumerWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PhotoDetailsScreen(
-                                  address: photoProvider.location ?? AppStrings.unknownData,
-                                  date: photoProvider.date ?? AppStrings.unknownData,
-                                  image: photoProvider.localPath!,
-                                  syncStatus: photoProvider.syncStatus,
-                                  time: photoProvider.time ?? AppStrings.unknownData,
+                                  address:
+                                      photosProvider.value?.last.location ??
+                                      photoProvider.location ??
+                                      AppStrings.unknownData,
+                                  date:
+                                      photosProvider.value?.last.date ??
+                                      photoProvider.date ??
+                                      AppStrings.unknownData,
+                                  image:
+                                      photosProvider.value?.last.localPath ??
+                                      photoProvider.localPath!,
+                                  syncStatus:
+                                      photosProvider.value?.last.syncStatus ??
+                                      photoProvider.syncStatus,
+                                  time:
+                                      photosProvider.value?.last.time ??
+                                      photoProvider.time ??
+                                      AppStrings.unknownData,
                                 ),
                               ),
                             );
@@ -72,7 +86,12 @@ class TakePhotoScreen extends ConsumerWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                image: FileImage(File(photoProvider.localPath!)),
+                                image: FileImage(
+                                  File(
+                                    photosProvider.value?.last.localPath ??
+                                        photoProvider.localPath!,
+                                  ),
+                                ),
                                 fit: BoxFit.cover,
                               ),
                             ),
