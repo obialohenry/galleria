@@ -10,14 +10,12 @@ import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
 import 'package:geolocator/geolocator.dart';
 
-// ignore: must_be_immutable
 class TakePhotoScreen extends ConsumerWidget {
   const TakePhotoScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final camerasProvider = ref.watch(cameraControllerProvider);
-    final photoProvider = ref.watch(photoViewModel);
     final photosProvider = ref.watch(photosViewModel);
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
@@ -50,7 +48,7 @@ class TakePhotoScreen extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  photoProvider.localPath == null && photosProvider.value!.isEmpty
+                  photosProvider.value!.isEmpty
                       ? SizedBox(height: 45, width: 45)
                       : GestureDetector(
                           onTap: () {
@@ -60,21 +58,17 @@ class TakePhotoScreen extends ConsumerWidget {
                                 builder: (context) => PhotoDetailsScreen(
                                   address:
                                       photosProvider.value?.last.location ??
-                                      photoProvider.location ??
                                       AppStrings.unknownData,
                                   date:
                                       photosProvider.value?.last.date ??
-                                      photoProvider.date ??
                                       AppStrings.unknownData,
                                   image:
                                       photosProvider.value?.last.localPath ??
-                                      photoProvider.localPath!,
+                                      AppStrings.unknownData,
                                   syncStatus:
-                                      photosProvider.value?.last.syncStatus ??
-                                      photoProvider.syncStatus,
+                                      photosProvider.value?.last.syncStatus ?? false,
                                   time:
                                       photosProvider.value?.last.time ??
-                                      photoProvider.time ??
                                       AppStrings.unknownData,
                                 ),
                               ),
@@ -88,8 +82,7 @@ class TakePhotoScreen extends ConsumerWidget {
                               image: DecorationImage(
                                 image: FileImage(
                                   File(
-                                    photosProvider.value?.last.localPath ??
-                                        photoProvider.localPath!,
+                                    photosProvider.value!.last.localPath!,
                                   ),
                                 ),
                                 fit: BoxFit.cover,
@@ -113,14 +106,6 @@ class TakePhotoScreen extends ConsumerWidget {
                         print(
                           "date:$date\ntime:$time\nlat:${position.latitude}\nlong:${position.longitude}\naddress:$address\nimage:${image.path}",
                         );
-                        ref
-                            .read(photoViewModel.notifier)
-                            .changedPhoto(
-                              localPath: image.path,
-                              date: date,
-                              time: time,
-                              location: address,
-                            );
                         ref
                             .read(photosViewModel.notifier)
                             .updatePhotosList(
