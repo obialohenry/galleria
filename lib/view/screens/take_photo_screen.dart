@@ -6,20 +6,16 @@ import 'package:galleria/config/app_colors.dart';
 import 'package:galleria/view/components/app_text.dart';
 import 'package:galleria/view/screens/photos/photo_details_screen.dart';
 import 'package:galleria/view_model/cameras_view_model.dart';
+import 'package:galleria/view_model/photos_view_model.dart';
 
 // ignore: must_be_immutable
-class TakePhotoScreen extends ConsumerStatefulWidget {
+class TakePhotoScreen extends ConsumerWidget {
   const TakePhotoScreen({super.key});
 
   @override
-  ConsumerState<TakePhotoScreen> createState() => _TakePhotoScreenState();
-}
-
-class _TakePhotoScreenState extends ConsumerState<TakePhotoScreen> {
-  File? image;
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final camerasProvider = ref.watch(cameraControllerProvider);
+    final photoProvider = ref.watch(photoViewModel);
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
@@ -51,33 +47,34 @@ class _TakePhotoScreenState extends ConsumerState<TakePhotoScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  image == null
+                  photoProvider.localPath == null
                       ? SizedBox(height: 45, width: 45)
                       : GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PhotoDetailsScreen()),
-                      );
-                    },
-                    child: Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                                image: FileImage(File(image!.path)),
-                          fit: BoxFit.cover,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => PhotoDetailsScreen()),
+                            );
+                          },
+                          child: Container(
+                            height: 45,
+                            width: 45,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: FileImage(File(photoProvider.localPath!)),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
                   GestureDetector(
                     onTap: () async {
                       try {
-                        image = await ref.read(cameraControllerProvider.notifier).takePicture();
-                        print("PICTURE: ${image?.path}");
-                        setState(() {});
+                        final File image = await ref
+                            .read(cameraControllerProvider.notifier)
+                            .takePicture();
+                        ref.read(photoViewModel.notifier).changedPhoto(localPath: image.path);
                       } catch (e, s) {
                         print("An error occured $e at\n$s");
                       }
