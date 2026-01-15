@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +17,6 @@ class TakePhotoScreen extends ConsumerStatefulWidget {
 
 class _TakePhotoScreenState extends ConsumerState<TakePhotoScreen> {
   File? image;
-
   @override
   Widget build(BuildContext context) {
     final camerasProvider = ref.watch(cameraControllerProvider);
