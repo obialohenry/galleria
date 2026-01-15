@@ -30,7 +30,7 @@ class UtilFunctions {
   ///
   /// Throws a [LocationServiceDisabledException] or [PermissionDeniedException]
   /// when location services are unavailable or permissions are not granted.
-  Future<Position> determinePosition() async {
+  static Future<Position> determinePosition() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       throw Exception('Location services are disabled.');
@@ -64,7 +64,10 @@ class UtilFunctions {
   /// If the list is not empty store the first placemark item. return an "Uknown location" string if empty.
   /// From the stored placemark item, we get non-nullable string parts that make up an acceptable address,
   /// and if empty or reverse geocoding fails returns a the "Unknown location" placeholder.
-  Future<String> determineAddress({required double latitude, required double longitude}) async {
+  static Future<String> determineAddress({
+    required double latitude,
+    required double longitude,
+  }) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
 
@@ -72,7 +75,6 @@ class UtilFunctions {
 
       final address = placemarks.first;
       final addressParts = [
-        address.street,
         address.locality,
         address.administrativeArea,
         address.country,

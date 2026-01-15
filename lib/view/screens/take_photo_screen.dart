@@ -3,10 +3,14 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/config/app_colors.dart';
+import 'package:galleria/config/app_strings.dart';
+import 'package:galleria/model/local/photo_model.dart';
+import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
 import 'package:galleria/view/screens/photos/photo_details_screen.dart';
 import 'package:galleria/view_model/cameras_view_model.dart';
 import 'package:galleria/view_model/photos_view_model.dart';
+import 'package:geolocator/geolocator.dart';
 
 // ignore: must_be_immutable
 class TakePhotoScreen extends ConsumerWidget {
@@ -53,7 +57,15 @@ class TakePhotoScreen extends ConsumerWidget {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => PhotoDetailsScreen()),
+                              MaterialPageRoute(
+                                builder: (context) => PhotoDetailsScreen(
+                                  address: photoProvider.location ?? AppStrings.unknownData,
+                                  date: photoProvider.date ?? AppStrings.unknownData,
+                                  image: photoProvider.localPath!,
+                                  syncStatus: photoProvider.syncStatus,
+                                  time: photoProvider.time ?? AppStrings.unknownData,
+                                ),
+                              ),
                             );
                           },
                           child: Container(
@@ -71,10 +83,37 @@ class TakePhotoScreen extends ConsumerWidget {
                   GestureDetector(
                     onTap: () async {
                       try {
+                        final date = UtilFunctions.formatDate(DateTime.now());
+                        final time = UtilFunctions.formatTime(DateTime.now());
+                        Position position = await UtilFunctions.determinePosition();
+                        final address = await UtilFunctions.determineAddress(
+                          latitude: position.latitude,
+                          longitude: position.longitude,
+                        );
                         final File image = await ref
                             .read(cameraControllerProvider.notifier)
                             .takePicture();
-                        ref.read(photoViewModel.notifier).changedPhoto(localPath: image.path);
+                        print(
+                          "date:$date\ntime:$time\nlat:${position.latitude}\nlong:${position.longitude}\naddress:$address\nimage:${image.path}",
+                        );
+                        ref
+                            .read(photoViewModel.notifier)
+                            .changedPhoto(
+                              localPath: image.path,
+                              date: date,
+                              time: time,
+                              location: address,
+                            );
+                        ref
+                            .read(photosViewModel.notifier)
+                            .updatePhotosList(
+                              PhotoModel(
+                                date: date,
+                                time: time,
+                                localPath: image.path,
+                                location: address,
+                              ),
+                            );
                       } catch (e, s) {
                         print("An error occured $e at\n$s");
                       }

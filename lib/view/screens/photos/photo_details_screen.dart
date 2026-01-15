@@ -1,16 +1,23 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:galleria/config/app_colors.dart';
 import 'package:galleria/config/app_strings.dart';
 import 'package:galleria/view/components/app_text.dart';
 
-class PhotoDetailsScreen extends StatefulWidget {
-  const PhotoDetailsScreen({super.key, this.image});
-  final String? image;
-  @override
-  State<PhotoDetailsScreen> createState() => _PhotoDetailsScreenState();
-}
-
-class _PhotoDetailsScreenState extends State<PhotoDetailsScreen> {
+class PhotoDetailsScreen extends StatelessWidget {
+  const PhotoDetailsScreen({
+    super.key,
+    required this.image,
+    required this.address,
+    required this.date,
+    required this.time,
+    required this.syncStatus,
+  });
+  final String image;
+  final String date;
+  final String time;
+  final String address;
+  final bool syncStatus;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,8 +44,8 @@ class _PhotoDetailsScreenState extends State<PhotoDetailsScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AppText(text: "07/01/2026", fontWeight: FontWeight.w700),
-                          AppText(text: "7:44 AM", color: AppColors.kTextSecondary, fontSize: 14),
+                          AppText(text: date, fontWeight: FontWeight.w700),
+                          AppText(text: time, color: AppColors.kTextSecondary, fontSize: 14),
                         ],
                       ),
                     ],
@@ -68,7 +75,7 @@ class _PhotoDetailsScreenState extends State<PhotoDetailsScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(widget.image ?? "assets/images/daenerys.jpeg"),
+                    image: FileImage(File(image)),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -82,11 +89,11 @@ class _PhotoDetailsScreenState extends State<PhotoDetailsScreen> {
                   SizedBox(height: 10),
                   AppText(text: AppStrings.location, fontWeight: FontWeight.w700),
                   SizedBox(height: 5),
-                  AppText(text: "123 Main Street...", color: AppColors.kTextSecondary),
+                  AppText(text: address, color: AppColors.kTextSecondary),
                   SizedBox(height: 10),
                   AppText(text: AppStrings.localPath, fontWeight: FontWeight.w700),
                   SizedBox(height: 5),
-                  AppText(text: "/storage/emulated/...", color: AppColors.kTextSecondary),
+                  AppText(text: image, color: AppColors.kTextSecondary),
                 ],
               ),
             ),

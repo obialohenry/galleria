@@ -7,4 +7,5 @@ class AppStrings {
   static const localPath = "Local Path";
   static const failedToSaveImage = "Failed to save image to gallery";
   static const unknownLocation = "Unknown location";
+  static const unknownData = "Unknown Data";
 }

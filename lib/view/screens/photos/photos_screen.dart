@@ -1,56 +1,92 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/config/app_colors.dart';
+import 'package:galleria/config/app_strings.dart';
+import 'package:galleria/model/local/photo_model.dart';
 import 'package:galleria/view/components/app_text.dart';
 import 'package:galleria/view/screens/photos/photo_details_screen.dart';
+import 'package:galleria/view_model/photos_view_model.dart';
 
-class PhotosScreen extends StatefulWidget {
+class PhotosScreen extends ConsumerWidget {
   const PhotosScreen({super.key});
 
   @override
-  State<PhotosScreen> createState() => _PhotosScreenState();
-}
-
-class _PhotosScreenState extends State<PhotosScreen> {
-  final List<String> _photos = ["assets/images/daenerys.jpeg", "assets/images/justice-league.jpg"];
-  String photo(int index) {
-    if ((index + 1) % 2 != 0) {
-      return _photos[0];
-    } else {
-      return _photos[1];
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final photosProvider = ref.watch(photosViewModel);
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
-        child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 20,
-            childAspectRatio: 0.5
-            ),
-          shrinkWrap: true,
-          physics: const BouncingScrollPhysics(),
-          padding:const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-          itemCount: 20,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> PhotoDetailsScreen()));
-              },
-              child: Container(
-                height: 250,
-                width: 120,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  image: DecorationImage(image: AssetImage(photo(index)), fit: BoxFit.cover),
-                ),
-              ),
-            );
+        child: photosProvider.when(
+          data: (photos) {
+            return photos.isNotEmpty
+                ? GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 20,
+                      childAspectRatio: 0.5,
+                    ),
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                    itemCount: photos.length,
+                    itemBuilder: (context, index) {
+                      PhotoModel aGridPhoto = photos[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PhotoDetailsScreen(
+                                address: aGridPhoto.location ?? AppStrings.unknownData,
+                                date: aGridPhoto.date ?? AppStrings.unknownData,
+                                image: aGridPhoto.localPath!,
+                                syncStatus: aGridPhoto.syncStatus,
+                                time: aGridPhoto.time ?? AppStrings.unknownData,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          height: 250,
+                          width: 120,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            image: DecorationImage(
+                              image: FileImage(File(aGridPhoto.localPath!)),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: AppText(
+                        text: AppStrings.noPhotosYet,
+                        color: AppColors.kTextSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  );
           },
+          error: (error, stackTrace) => Expanded(
+            flex: 2,
+            child: Container(
+              color: AppColors.kPrimary,
+              child: Center(child: AppText(text: error.toString())),
+            ),
+          ),
+          loading: () => Expanded(
+            flex: 3,
+            child: Container(
+              color: Colors.transparent,
+              child: Center(child: CircularProgressIndicator(color: AppColors.kPrimary)),
+            ),
+          ),
         ),
       ),
     );
