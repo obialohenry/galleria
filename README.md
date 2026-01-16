@@ -10,31 +10,31 @@ This project was built as part of a technical assessment, with emphasis on code 
 ### Sprint 1: Core UI & Local Photo Capture
 This sprint focused on establishing the application foundation, core navigation, and the complete local photo capture pipeline.
 #### Features Implemented
--Bottom navigation dashboard with two primary sections:
- .Take a Photo – Camera interface for capturing photos
- .Photos – In-app gallery displaying photos taken with the app
+- Bottom navigation dashboard with two primary sections:
+  . Take a Photo – Camera interface for capturing photos
+  . Photos – In-app gallery displaying photos taken with the app
 
--Camera integration for photo capture
+- Camera integration for photo capture
 
--Automatic saving of captured photos to the device’s native gallery
+- Automatic saving of captured photos to the device’s native gallery
 
- .Photos are grouped under a custom album named "Galleria"
+  . Photos are grouped under a custom album named "Galleria"
 
--Local persistence of photo metadata, including:
- .Date & time captured
- .Local file path
- .Sync status (default: not synced)
+- Local persistence of photo metadata, including:
+  . Date & time captured
+  . Local file path
+  . Sync status (default: not synced)
 
--Grid view display of locally saved photos
+- Grid view display of locally saved photos
 
--Photo detail screen with:
- .Photo preview
- .Date & time information
- .Location address (when permission is granted)
- .Local file path
- .Manual "Sync this photo" action (UI only at this stage)
+- Photo detail screen with:
+  . Photo preview
+  . Date & time information
+  . Location address (when permission is granted)
+  . Local file path
+  . Manual "Sync this photo" action (UI only at this stage)
 
--Visual sync status indicators
+- Visual sync status indicators
 
 #### Known Issues & Observations (Sprint 1)
 The following behaviors were observed during testing and are documented for transparency:
