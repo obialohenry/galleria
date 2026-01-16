@@ -119,6 +119,8 @@ Because development was done on Windows, the iOS-specific Podfile setup could no
  - Date & Time Formatting: intl
 
  - Scan Device Gallery: photo_manager
+
+ - ID generation: UUID
   
 ## Next Planned Sprints
 
