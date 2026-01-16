@@ -5,6 +5,46 @@ Galleria is a Flutter mobile application that allows users to capture photos, au
 
 This project was built as part of a technical assessment, with emphasis on code quality, architectural decisions, and problem-solving approach.
 
+## Folder Structure
+
+lib/
+├─ config/                 # App-wide constants
+│  ├─ app_colors.dart      # Color palette
+│  └─ app_strings.dart     # String constants
+│
+├─ local_storage/           # Hive/local database related files
+│  └─ photo_local_db.dart  # Photo storage and retrieval
+│
+├─ model/                  # Data models
+│  └─ local/
+│     ├─ camera_state.dart
+│     ├─ dashboard_state.dart
+│     ├─ dummy_data.dart
+│     ├─ photo_model.dart
+│     └─ photo_model.g.dart
+│
+├─ src/                    # Centralized imports for easier access
+│  ├─ config.dart
+│  ├─ model.dart
+│  ├─ screens.dart
+│  └─ view_model.dart
+│
+├─ utils/                  # Utility/helper functions
+│  └─ util_functions.dart
+│
+├─ view/                   # UI layer
+│  ├─ components/          # Reusable UI widgets (e.g., AppText)
+│  └─ screens/             # Individual app screens
+│
+├─ view_model/             # State management using Riverpod
+│  ├─ cameras_view_model.dart
+│  └─ dashboard_view_model.dart
+│
+├─ cloud_sync/             # Cloud synchronization logic
+│
+└─ main.dart               # App entry point
+
+
 ## Features Implemented (Sprint-based)
 
 ### Sprint 1: Core UI & Local Photo Capture

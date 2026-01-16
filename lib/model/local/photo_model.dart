@@ -5,19 +5,29 @@ part 'photo_model.g.dart';
 @HiveType(typeId: 0)
 class PhotoModel extends HiveObject {
   @HiveField(0)
+  String id;
+  
+  @HiveField(1)
   String? date;
 
-  @HiveField(1)
+  @HiveField(2)
   String? time;
 
-  @HiveField(2)
+  @HiveField(3)
   String? localPath;
 
-  @HiveField(3)
+  @HiveField(4)
   String? location;
 
-  @HiveField(4)
-  bool syncStatus;
+  @HiveField(5)
+  bool isSynced;
 
-  PhotoModel({this.date, this.time, this.localPath, this.location, this.syncStatus = false});
+  PhotoModel({
+    required this.id,
+    this.date,
+    this.time,
+    this.localPath,
+    this.location,
+    this.isSynced = false,
+  });
 }

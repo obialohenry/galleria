@@ -41,7 +41,7 @@ class PhotosScreen extends ConsumerWidget {
                                 address: aGridPhoto.location ?? AppStrings.unknownData,
                                 date: aGridPhoto.date ?? AppStrings.unknownData,
                                 image: aGridPhoto.localPath!,
-                                syncStatus: aGridPhoto.syncStatus,
+                                syncStatus: aGridPhoto.isSynced,
                                 time: aGridPhoto.time ?? AppStrings.unknownData,
                               ),
                             ),

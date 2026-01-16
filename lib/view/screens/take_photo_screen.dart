@@ -9,6 +9,7 @@ import 'package:galleria/src/view_model.dart';
 import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:uuid/uuid.dart';
 
 class TakePhotoScreen extends ConsumerWidget {
   const TakePhotoScreen({super.key});
@@ -66,7 +67,7 @@ class TakePhotoScreen extends ConsumerWidget {
                                       photosProvider.value?.last.localPath ??
                                       AppStrings.unknownData,
                                   syncStatus:
-                                      photosProvider.value?.last.syncStatus ?? false,
+                                      photosProvider.value?.last.isSynced ?? false,
                                   time:
                                       photosProvider.value?.last.time ??
                                       AppStrings.unknownData,
@@ -110,6 +111,7 @@ class TakePhotoScreen extends ConsumerWidget {
                             .read(photosViewModel.notifier)
                             .updatePhotosList(
                               PhotoModel(
+                                id: const Uuid().v4(),
                                 date: date,
                                 time: time,
                                 localPath: image.path,
