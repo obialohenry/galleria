@@ -66,7 +66,7 @@ class TakePhotoScreen extends ConsumerWidget {
                                   image:
                                       photosProvider.value?.last.localPath ??
                                       AppStrings.unknownData,
-                                  syncStatus:
+                                  isSynced:
                                       photosProvider.value?.last.isSynced ?? false,
                                   time:
                                       photosProvider.value?.last.time ??

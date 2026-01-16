@@ -11,13 +11,13 @@ class PhotoDetailsScreen extends StatelessWidget {
     required this.address,
     required this.date,
     required this.time,
-    required this.syncStatus,
+    required this.isSynced,
   });
   final String image;
   final String date;
   final String time;
   final String address;
-  final bool syncStatus;
+  final bool isSynced;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,21 +50,25 @@ class PhotoDetailsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      comingSoonDialog(context);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: AppColors.kBackgroundSecondary,
-                      ),
-                      child: AppText(
-                        text: AppStrings.syncPhoto,
-                        color: AppColors.kPrimaryPressed,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
+                  Visibility(
+                    visible: !isSynced,
+                    replacement: AppText(text: AppStrings.synced, fontWeight: FontWeight.w700),
+                    child: GestureDetector(
+                      onTap: () {
+                        comingSoonDialog(context);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: AppColors.kBackgroundSecondary,
+                        ),
+                        child: AppText(
+                          text: AppStrings.syncPhoto,
+                          color: AppColors.kPrimaryPressed,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ),
