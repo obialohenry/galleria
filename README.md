@@ -11,38 +11,37 @@ This project was built as part of a technical assessment, with emphasis on code 
 This sprint focused on establishing the application foundation, core navigation, and the complete local photo capture pipeline.
 #### Features Implemented
 - Bottom navigation dashboard with two primary sections:
-  . Take a Photo – Camera interface for capturing photos
-  . Photos – In-app gallery displaying photos taken with the app
+  - Take a Photo – Camera interface for capturing photos
+  - Photos – In-app gallery displaying photos taken with the app
 
 - Camera integration for photo capture
 
 - Automatic saving of captured photos to the device’s native gallery
-
-  . Photos are grouped under a custom album named "Galleria"
+  - Photos are grouped under a custom album named "Galleria"
 
 - Local persistence of photo metadata, including:
-  . Date & time captured
-  . Local file path
-  . Sync status (default: not synced)
+  - Date & time captured
+  - Local file path
+  - Sync status (default: not synced)
 
 - Grid view display of locally saved photos
 
 - Photo detail screen with:
-  . Photo preview
-  . Date & time information
-  . Location address (when permission is granted)
-  . Local file path
-  . Manual "Sync this photo" action (UI only at this stage)
+  - Photo preview
+  - Date & time information
+  - Location address (when permission is granted)
+  - Local file path
+  - Manual "Sync this photo" action (UI only at this stage)
 
 - Visual sync status indicators
 
 #### Known Issues & Observations (Sprint 1)
 The following behaviors were observed during testing and are documented for transparency:
-1.Initial Photo Preview Delay (First App Launch)
-  On first use of the app, when the user taps the Take Photo button and grants location permission, there is a noticeable delay     before the captured image appears in the preview screen.
+1. Initial Photo Preview Delay (First App Launch)
+   On first use of the app, when the user taps the Take Photo button and grants location permission, there is a noticeable delay     before the captured image appears in the preview screen.
 
-2.Subsequent Photo Capture Preview Delay
-  A similar short delay occurs whenever a new photo is captured, before the image is rendered on the preview screen.
+2. Subsequent Photo Capture Preview Delay
+   A similar short delay occurs whenever a new photo is captured, before the image is rendered on the preview screen.
   
 Note: Despite this delay, the photo capture, saving process, and gallery updates work correctly.
 
@@ -55,39 +54,39 @@ Because development was done on Windows, the iOS-specific Podfile setup could no
 
 
 ## Tech Stack & Decisions
- . Flutter – Cross-platform mobile framework
+ - Flutter – Cross-platform mobile framework
 
- . State Management: Riverpod
+ - State Management: Riverpod
 
- . Camera: camera plugin
+ - Camera: camera plugin
 
- . Gallery Saving: gallery_saver_plus
+ - Gallery Saving: gallery_saver_plus
 
- . Local Persistence: Hive
+ - Local Persistence: Hive
 
- . Location: geolocator
+ - Location: geolocator
 
- . Reverse Geocoding: geocoding
+ - Reverse Geocoding: geocoding
 
- . Code Generation: hive_generator, build_runner
+ - Code Generation: hive_generator, build_runner
 
- . File System Access: path_provider
+ - File System Access: path_provider
 
- . Date & Time Formatting: intl
+ - Date & Time Formatting: intl
   
 ## Next Planned Sprints
 
-. Cloud synchronization (Firebase / Supabase)
+- Cloud synchronization (Firebase / Supabase)
 
-. Batch and scheduled sync
+- Batch and scheduled sync
 
 ## Trade-offs
 
-. Cloud synchronization was intentionally deferred to focus on a stable local capture pipeline.
+- Cloud synchronization was intentionally deferred to focus on a stable local capture pipeline.
 
-. iOS gallery configuration was documented but not executed due to OS limitations.
+- iOS gallery configuration was documented but not executed due to OS limitations.
 
-. UI prioritizes clarity and functionality over visual polish at this stage.
+- UI prioritizes clarity and functionality over visual polish at this stage.
 
 ## Setup Instructions
 
