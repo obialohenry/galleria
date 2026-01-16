@@ -9,4 +9,8 @@ class AppStrings {
   static const unknownLocation = "Unknown location";
   static const unknownData = "Unknown Data";
   static const boxName = "photosBox";
+  static const comingSoon = "Coming Soon";
+  static const thisFeatureIsUnderDevelopment =
+      "This feature is under development and will be available soon.";
+  static const okay = "Okay";
 }

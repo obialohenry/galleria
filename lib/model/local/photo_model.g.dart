@@ -23,13 +23,14 @@ class PhotoModelAdapter extends TypeAdapter<PhotoModel> {
       localPath: fields[3] as String?,
       location: fields[4] as String?,
       isSynced: fields[5] as bool,
+      cloudId: fields[6] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PhotoModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class PhotoModelAdapter extends TypeAdapter<PhotoModel> {
       ..writeByte(4)
       ..write(obj.location)
       ..writeByte(5)
-      ..write(obj.isSynced);
+      ..write(obj.isSynced)
+      ..writeByte(6)
+      ..write(obj.cloudId);
   }
 
   @override

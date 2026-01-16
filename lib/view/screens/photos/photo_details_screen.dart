@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:galleria/src/config.dart';
+import 'package:galleria/utils/alert.dart';
 import 'package:galleria/view/components/app_text.dart';
 
 class PhotoDetailsScreen extends StatelessWidget {
@@ -50,7 +51,9 @@ class PhotoDetailsScreen extends StatelessWidget {
                     ],
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      comingSoonDialog(context);
+                    },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       decoration: BoxDecoration(
@@ -73,10 +76,7 @@ class PhotoDetailsScreen extends StatelessWidget {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: FileImage(File(image)),
-                    fit: BoxFit.cover,
-                  ),
+                  image: DecorationImage(image: FileImage(File(image)), fit: BoxFit.cover),
                 ),
               ),
             ),

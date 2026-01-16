@@ -9,5 +9,7 @@ class AppColors {
   static const kPrimaryPressed = Color(0xFF000000);
   static const kSuccess = Color(0xFF3AA37E);
   static const kPending = Color(0xFFFFC6C0);
-  static const kError = Color(0xFFDC2626); 
+  static const kError = Color(0xFFDC2626);
+  static const kContentAlert = Color(0xff000000);
+  static const kSurfaceAlert = Color(0xffffffff);
 }

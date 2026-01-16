@@ -6,7 +6,7 @@ part 'photo_model.g.dart';
 class PhotoModel extends HiveObject {
   @HiveField(0)
   String id;
-  
+
   @HiveField(1)
   String? date;
 
@@ -22,6 +22,9 @@ class PhotoModel extends HiveObject {
   @HiveField(5)
   bool isSynced;
 
+  @HiveField(6)
+  String? cloudId;
+
   PhotoModel({
     required this.id,
     this.date,
@@ -29,5 +32,6 @@ class PhotoModel extends HiveObject {
     this.localPath,
     this.location,
     this.isSynced = false,
+    this.cloudId,
   });
 }
