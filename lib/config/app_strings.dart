@@ -1,7 +1,7 @@
 class AppStrings {
   static const inter = "inter";
   static const noPhotosYet = "No photos yet. Take your first photo to get started";
-  static const syncPhoto = "Sync";
+  static const syncPhoto = "Sync this photo";
   static const synced = "Synced";
   static const location = "Location";
   static const localPath = "Local Path";
