@@ -38,10 +38,14 @@ This sprint focused on establishing the application foundation, core navigation,
 #### Known Issues & Observations (Sprint 1)
 The following behaviors were observed during testing and are documented for transparency:
 1. Initial Photo Preview Delay (First App Launch)
-   On first use of the app, when the user taps the Take Photo button and grants location permission, there is a noticeable delay     before the captured image appears in the preview screen.
+  On first use of the app, when the user taps the Take Photo button and grants location permission, there is a noticeable delay     before the captured image appears in the preview screen.
 
 2. Subsequent Photo Capture Preview Delay
-   A similar short delay occurs whenever a new photo is captured, before the image is rendered on the preview screen.
+  A similar short delay occurs whenever a new photo is captured, before the image is rendered on the preview screen.
+
+3. Photo Ordering Inconsistency After Gallery–Hive Reconciliation
+  Observation
+  After snapped images are retrieved from the device gallery (Galleria album) and reconciled with Hive’s local database, the displayed photo list is no longer ordered by capture time. As a result, the most recently captured photo may appear in the middle or at the beginning/end of the list instead of consistently appearing first (or last).
   
 Note: Despite this delay, the photo capture, saving process, and gallery updates work correctly.
 
@@ -73,6 +77,8 @@ Because development was done on Windows, the iOS-specific Podfile setup could no
  - File System Access: path_provider
 
  - Date & Time Formatting: intl
+
+ - Scan Device Gallery: photo_manager
   
 ## Next Planned Sprints
 
