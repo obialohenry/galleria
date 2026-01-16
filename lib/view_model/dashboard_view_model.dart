@@ -11,6 +11,7 @@ class DashboardViewModel extends Notifier<DashboardState> {
     return DashboardState();
   }
 
+  ///Changes between dashboard screens
   void changeScreen(int index) {
     state = state.screenChanged(index);
   }

@@ -13,6 +13,10 @@ class PhotosViewModel extends AsyncNotifier<List<PhotoModel>> {
     return PhotosLocalDb().getAllPhotos();
   }
 
+  ///Update  list of photo's(a PhotoModel object) and save to Hive's database.
+  ///
+  ///Updates list with previous PhotoModel object if any, and new onw.
+  ///Saves newly updated list to the data base.
   void updatePhotosList(PhotoModel photo) async {
     final currentList = state.value ?? [];
     final List<PhotoModel> newList = [...currentList, photo];

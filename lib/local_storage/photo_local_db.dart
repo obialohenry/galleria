@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 class PhotosLocalDb {
   Box<PhotoModel> get _box => Hive.box<PhotoModel>(AppStrings.boxName);
 
+  ///Save a photo object (PhotoModel) to the db.
   Future<void> savePhoto(PhotoModel photo) async {
     try {
       await _box.put(photo.localPath, photo);
@@ -14,6 +15,7 @@ class PhotosLocalDb {
     }
   }
 
+  ///Return all photo objects stored in the db.
   List<PhotoModel> getAllPhotos() {
     try {
       print("photos: ${_box.values.toList()}");
@@ -24,7 +26,7 @@ class PhotosLocalDb {
     }
   }
 
-  ///Returns a List of the keys' unique to stored photo models in the app.
+  ///Return a List of the keys' unique to stored photo models in the app.
   List<dynamic> getAllPhotoKeys() {
     try {
       print("photos Keys: ${_box.keys.toList()}");

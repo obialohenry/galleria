@@ -35,6 +35,15 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
     return _initializeCamera(cameras: cameras, cameraIndex: 0);
   }
 
+  ///Returns a new instance of camera state.
+  ///
+  ///parameters:
+  ///-cameras: The list of available cameras from the Camera plugin
+  ///-cameraIndex: The index number used to get a camera item from the list.
+  ///
+  ///Disposes of previous camera controller is any.
+  ///Creates a new camera controller, a camera item and it's resolution.
+  ///Initializes the controller and returns a new camera state instance using the controller and camera index.
   Future<CameraState> _initializeCamera({
     required List<CameraDescription> cameras,
     required int cameraIndex,
@@ -46,6 +55,7 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
     return CameraState(controller: _controller!, cameraIndex: cameraIndex);
   }
 
+  ///Switch between front and back cameras.
   Future<void> switchCamera() async {
     final cameras = await ref.read(availableCamerasProvider.future);
     final currentIndex = state.value!.cameraIndex;
@@ -57,6 +67,7 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
     );
   }
 
+  ///Take a photo and save it to the Galleria album on the device.
   Future<File> takePicture() async {
     final cameraState = state.value!;
     final XFile xFile = await cameraState.controller.takePicture();

@@ -88,6 +88,14 @@ class UtilFunctions {
     }
   }
 
+  ///Scan album and return a list of images present.
+  ///
+  ///Scans through Galleria album on the phone using the photo_manager plugin.
+  ///It returns an empty list based on the following conditions:
+  ///- If the Galleria album have not yet been created on the device.
+  ///- If on first app usage, user denies photo namager's request permission.
+  ///Returns a list of image paths of available images in the devices's Galleria
+  ///album when successful.
   static Future<List<String>> scanGalleriaAlbum() async {
     final PermissionState ps = await PhotoManager.requestPermissionExtend();
     List<String> galleriaPhotoPaths;
@@ -102,6 +110,7 @@ class UtilFunctions {
         print("An error occured $e at $s");
       }
 
+      //Most likely due to the album not haven been created on the device.
       if (galleriaAlbum == null) return [];
 
       final List<AssetEntity> photos = await galleriaAlbum.getAssetListPaged(page: 0, size: 100);
@@ -111,6 +120,7 @@ class UtilFunctions {
           .map((file) => file!.path.split('/').last)
           .toList();
     } else {
+      //Permisson denied.
       galleriaPhotoPaths = [];
       PhotoManager.openSetting();
     }
@@ -118,6 +128,15 @@ class UtilFunctions {
     return galleriaPhotoPaths;
   }
 
+  ///Delete PhotoModel objects in the db using it's keys
+  ///
+  ///parameters:
+  ///- imagePaths: list of image path's in Galleria's album on the user's device.
+  ///
+  ///Gets the entire keys stored in hive's data base.
+  ///Creates a new key list `keysToDelete`, stores key strings that are not
+  ///in the Galleria's album on the device, and deletes the list of keys from hive's data base.
+  ///Reconciling hive's data base with images present on the album.
   static void updateHiveDbBasedOnPhotosInGallery(List<String> imagePaths) {
     final photoKeys = PhotosLocalDb().getAllPhotoKeys();
 
