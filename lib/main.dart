@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/src/model.dart';
+import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/screens/dashboard_screen.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,6 +17,10 @@ Future<void> main() async {
   Hive.registerAdapter(PhotoModelAdapter());
 
   await Hive.openBox<PhotoModel>("photosBox");
+
+  // scan Galleria and update Hive
+  final galleriaPaths = await UtilFunctions.scanGalleriaAlbum();
+  UtilFunctions.updateHiveDbBasedOnPhotosInGallery(galleriaPaths);
 
   runApp(ProviderScope(child: const MyApp()));
 }

@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:galleria/config/app_strings.dart';
+import 'package:galleria/local_storage/photo_local_db.dart';
 import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 class UtilFunctions {
   ///Create an album name on device, and save a file image's path to the created album in the device.
@@ -13,13 +15,13 @@ class UtilFunctions {
   }) async {
     return await GallerySaver.saveImage(file.path, albumName: albumName) ?? false;
   }
-  
+
   ///Return a formatted date in the pattern passed in as an argument.
   static String formatDate(DateTime dateTime, {String pattern = 'MM/dd/yyyy'}) {
     final formattedDate = DateFormat(pattern).format(dateTime);
     return formattedDate;
   }
- 
+
   ///Return a formatted time in the pattern passed in as an argument.
   static String formatTime(DateTime dateTime, {String pattern = "Hm"}) {
     final formattedTime = DateFormat(pattern).format(dateTime);
@@ -74,11 +76,7 @@ class UtilFunctions {
       if (placemarks.isEmpty) return AppStrings.unknownLocation;
 
       final address = placemarks.first;
-      final addressParts = [
-        address.locality,
-        address.administrativeArea,
-        address.country,
-      ];
+      final addressParts = [address.locality, address.administrativeArea, address.country];
 
       final filteredParts = addressParts.where((part) => part != null && part.isNotEmpty);
       final formattedAddress = filteredParts.join(", ");
@@ -88,5 +86,44 @@ class UtilFunctions {
       print("An error occured $e at\n$s");
       return AppStrings.unknownLocation;
     }
+  }
+
+  static Future<List<String>> scanGalleriaAlbum() async {
+    final PermissionState ps = await PhotoManager.requestPermissionExtend();
+    List<String> galleriaPhotoPaths;
+    if (ps.isAuth || ps.hasAccess) {
+      final List<AssetPathEntity> albums = await PhotoManager.getAssetPathList();
+
+      AssetPathEntity? galleriaAlbum;
+      try {
+        galleriaAlbum = albums.firstWhere((album) => album.name == "Galleria");
+      } catch (e, s) {
+        galleriaAlbum = null;
+        print("An error occured $e at $s");
+      }
+
+      if (galleriaAlbum == null) return [];
+
+      final List<AssetEntity> photos = await galleriaAlbum.getAssetListPaged(page: 0, size: 100);
+      final List<File?> photoFiles = await Future.wait(photos.map((photo) => photo.file));
+      galleriaPhotoPaths = photoFiles
+          .where((file) => file != null)
+          .map((file) => file!.path.split('/').last)
+          .toList();
+    } else {
+      galleriaPhotoPaths = [];
+      PhotoManager.openSetting();
+    }
+    print("gallery photo Keys: $galleriaPhotoPaths");
+    return galleriaPhotoPaths;
+  }
+
+  static void updateHiveDbBasedOnPhotosInGallery(List<String> imagePaths) {
+    final photoKeys = PhotosLocalDb().getAllPhotoKeys();
+
+    final keysToDelete = photoKeys
+        .where((key) => !imagePaths.contains(key.split('/').last))
+        .toList();
+    PhotosLocalDb().deletePhotos(keysToDelete);
   }
 }

@@ -14,7 +14,7 @@ class PhotosLocalDb {
     }
   }
 
-   List<PhotoModel> getAllPhotos() {
+  List<PhotoModel> getAllPhotos() {
     try {
       print("photos: ${_box.values.toList()}");
       return _box.values.toList();
@@ -22,5 +22,20 @@ class PhotosLocalDb {
       print("An error occured: $e at\n$s");
       return [];
     }
+  }
+
+  ///Returns a List of the keys' unique to stored photo models in the app.
+  List<dynamic> getAllPhotoKeys() {
+    try {
+      print("photos Keys: ${_box.keys.toList()}");
+      return _box.keys.toList();
+    } catch (e, s) {
+      print("An error occured: $e at\n$s");
+      return [];
+    }
+  }
+
+  Future<void> deletePhotos(List<dynamic> keys) async {
+    await _box.deleteAll(keys);
   }
 }

@@ -6,6 +6,8 @@
 	<string>Location is used to tag photos with where they were taken.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need camera access to take photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key> 
+	<string>We need access to your photo library to display Galleria photos.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
   <string>Allow Galleria to save photos to your library</string>
 	<key>CFBundleDevelopmentRegion</key>
