@@ -16,7 +16,7 @@ void comingSoonDialog(BuildContext context) {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: AppText(
-         text: AppStrings.okay,color: AppColors.kContentAlert,
+         text: AppStrings.okay, color: AppColors.kSuccess,
         ),
           ),
         ],
