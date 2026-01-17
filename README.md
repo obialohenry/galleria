@@ -96,6 +96,19 @@ The gallery_saver_plus plugin requires additional iOS configuration within the P
 
 Because development was done on Windows, the iOS-specific Podfile setup could not be applied or tested locally. This configuration step is documented here for reviewers and future setup on macOS.
 
+### Sprint 2 – Cloud Synchronization (Planned)
+
+Cloud synchronization is outlined as the next sprint in this project but has **not yet been implemented** in this submission.
+
+The current implementation focuses on:
+- Local photo capture
+- Local gallery storage
+- Metadata persistence using Hive
+- Gallery-to-database reconciliation
+
+The cloud sync sprint is intentionally scoped as a follow-up to ensure the local data flow is correct and stable before introducing remote state.
+
+
 
 ## Tech Stack & Decisions
  - Flutter – Cross-platform mobile framework
@@ -145,3 +158,24 @@ Because development was done on Windows, the iOS-specific Podfile setup could no
 3. Ensure camera, storage, and location permissions are granted
 
 4. Run the app on a physical device (recommended for camera & gallery testing)
+
+### Permissions
+
+This app relies on multiple permissions to function correctly:
+
+- **Camera & Audio permissions**  
+  On first launch, the app will request permission to:
+  - Take pictures
+  - Record videos
+  - Record audio  
+
+  These permissions are required by the `camera` plugin itself and **must be accepted** for the photo capture functionality (Sprint 1) to work.
+
+- **Media / Gallery access permission**  
+  On initial installation and startup, the app will also request permission to access media on the device.
+
+  This permission is required because:
+  - Photos captured by Galleria are saved directly to a dedicated **Galleria album** on the device.
+  - On app startup, the app **scans the Galleria album** and reconciles the images found there with the locally persisted photo metadata stored in Hive.
+  - Without this permission, the app cannot correctly load or reconcile previously captured photos.
+
