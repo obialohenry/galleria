@@ -137,7 +137,7 @@ The cloud sync sprint is intentionally scoped as a follow-up to ensure the local
   
 ## Next Planned Sprints
 
-- Cloud synchronization (Firebase / Supabase)
+- Cloud synchronization (Firebase)
 
 - Batch and scheduled sync
 
