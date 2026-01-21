@@ -57,10 +57,10 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
 
   ///Switch between front and back cameras.
   Future<void> switchCamera() async {
+    state = const AsyncLoading();
+    
     final cameras = await ref.read(availableCamerasProvider.future);
     final currentIndex = state.value!.cameraIndex;
-
-    state = const AsyncLoading();
 
     state = AsyncValue.data(
       await _initializeCamera(cameras: cameras, cameraIndex: (currentIndex + 1) % cameras.length),
