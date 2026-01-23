@@ -92,7 +92,8 @@ class TakePhotoScreen extends ConsumerWidget {
                           ),
                         ),
                   GestureDetector(
-                    onTap: () async {
+                    onTap: !camerasProvider.value!.isSnapping
+                        ? () async {
                       try {
                         final date = UtilFunctions.formatDate(DateTime.now());
                         final time = UtilFunctions.formatTime(DateTime.now());
@@ -121,7 +122,8 @@ class TakePhotoScreen extends ConsumerWidget {
                       } catch (e, s) {
                         print("An error occured $e at\n$s");
                       }
-                    },
+                          }
+                        : () {},
                     child: Container(
                       height: 60,
                       width: 60,
