@@ -13,4 +13,5 @@ class AppStrings {
   static const thisFeatureIsUnderDevelopment =
       "This feature is under development and will be available soon.";
   static const okay = "Okay";
+  static const save = "save";
 }
