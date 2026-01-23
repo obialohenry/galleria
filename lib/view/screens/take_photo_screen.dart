@@ -57,20 +57,11 @@ class TakePhotoScreen extends ConsumerWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PhotoDetailsScreen(
-                                  address:
-                                      photosProvider.last.location ??
-                                      AppStrings.unknownData,
-                                  date:
-                                      photosProvider.last.date ??
-                                      AppStrings.unknownData,
-                                  image:
-                                      photosProvider.last.localPath ??
-                                      AppStrings.unknownData,
-                                  isSynced:
-                                      photosProvider.last.isSynced,
-                                  time:
-                                      photosProvider.last.time ??
-                                      AppStrings.unknownData,
+                                  address: photosProvider.last.location ?? AppStrings.unknownData,
+                                  date: photosProvider.last.date ?? AppStrings.unknownData,
+                                  image: photosProvider.last.localPath ?? AppStrings.unknownData,
+                                  isSynced: photosProvider.last.isSynced,
+                                  time: photosProvider.last.time ?? AppStrings.unknownData,
                                 ),
                               ),
                             );
@@ -81,11 +72,7 @@ class TakePhotoScreen extends ConsumerWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                image: FileImage(
-                                  File(
-                                    photosProvider.last.localPath!,
-                                  ),
-                                ),
+                                image: FileImage(File(photosProvider.last.localPath!)),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -94,36 +81,38 @@ class TakePhotoScreen extends ConsumerWidget {
                   GestureDetector(
                     onTap: !camerasProvider.value!.isSnapping
                         ? () async {
-                      try {
-                        final date = UtilFunctions.formatDate(DateTime.now());
-                        final time = UtilFunctions.formatTime(DateTime.now());
-                        Position position = await UtilFunctions.determinePosition();
-                        final address = await UtilFunctions.determineAddress(
-                          latitude: position.latitude,
-                          longitude: position.longitude,
-                        );
-                        final File image = await ref
-                            .read(cameraControllerProvider.notifier)
-                            .takePicture();
-                        print(
-                          "date:$date\ntime:$time\nlat:${position.latitude}\nlong:${position.longitude}\naddress:$address\nimage:${image.path}",
-                        );
-                        ref
-                            .read(photosViewModel.notifier)
-                            .updatePhotosList(
-                              PhotoModel(
-                                id: const Uuid().v4(),
-                                date: date,
-                                time: time,
-                                localPath: image.path,
-                                location: address,
-                              ),
-                            );
-                      } catch (e, s) {
-                        print("An error occured $e at\n$s");
-                      }
+                            try {
+                              final date = UtilFunctions.formatDate(DateTime.now());
+                              final time = UtilFunctions.formatTime(DateTime.now());
+                              Position position = await UtilFunctions.determinePosition();
+                              final address = await UtilFunctions.determineAddress(
+                                latitude: position.latitude,
+                                longitude: position.longitude,
+                              );
+                              final File image = await ref
+                                  .read(cameraControllerProvider.notifier)
+                                  .takePicture();
+                              print(
+                                "date:$date\ntime:$time\nlat:${position.latitude}\nlong:${position.longitude}\naddress:$address\nimage:${image.path}",
+                              );
+                              ref
+                                  .read(photosViewModel.notifier)
+                                  .updatePhotosList(
+                                    PhotoModel(
+                                      id: const Uuid().v4(),
+                                      date: date,
+                                      time: time,
+                                      localPath: image.path,
+                                      location: address,
+                                    ),
+                                  );
+                            } catch (e, s) {
+                              print("An error occured $e at\n$s");
+                            }
                           }
-                        : () {},
+                        : () {
+                            print("ALREADY IN THE PROCESS OF TAKING A PHOTO");
+                          },
                     child: Container(
                       height: 60,
                       width: 60,
