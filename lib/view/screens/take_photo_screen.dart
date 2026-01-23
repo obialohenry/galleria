@@ -49,7 +49,7 @@ class TakePhotoScreen extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  photosProvider.value!.isEmpty
+                  photosProvider.isEmpty
                       ? SizedBox(height: 45, width: 45)
                       : GestureDetector(
                           onTap: () {
@@ -58,18 +58,18 @@ class TakePhotoScreen extends ConsumerWidget {
                               MaterialPageRoute(
                                 builder: (context) => PhotoDetailsScreen(
                                   address:
-                                      photosProvider.value?.last.location ??
+                                      photosProvider.last.location ??
                                       AppStrings.unknownData,
                                   date:
-                                      photosProvider.value?.last.date ??
+                                      photosProvider.last.date ??
                                       AppStrings.unknownData,
                                   image:
-                                      photosProvider.value?.last.localPath ??
+                                      photosProvider.last.localPath ??
                                       AppStrings.unknownData,
                                   isSynced:
-                                      photosProvider.value?.last.isSynced ?? false,
+                                      photosProvider.last.isSynced,
                                   time:
-                                      photosProvider.value?.last.time ??
+                                      photosProvider.last.time ??
                                       AppStrings.unknownData,
                                 ),
                               ),
@@ -83,7 +83,7 @@ class TakePhotoScreen extends ConsumerWidget {
                               image: DecorationImage(
                                 image: FileImage(
                                   File(
-                                    photosProvider.value!.last.localPath!,
+                                    photosProvider.last.localPath!,
                                   ),
                                 ),
                                 fit: BoxFit.cover,

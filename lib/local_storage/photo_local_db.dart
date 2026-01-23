@@ -6,13 +6,15 @@ class PhotosLocalDb {
   Box<PhotoModel> get _box => Hive.box<PhotoModel>(AppStrings.boxName);
 
   ///Save a photo object (PhotoModel) to the db.
-  Future<void> savePhoto(PhotoModel photo) async {
+  Future<bool> savePhoto(PhotoModel photo) async {
     try {
       await _box.put(photo.localPath, photo);
       print("Successfully saved photo to hive.");
     } catch (e, s) {
       print("An error occured: $e at\n$s");
+      return false;
     }
+    return true;
   }
 
   ///Return all photo objects stored in the db.
