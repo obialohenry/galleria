@@ -79,40 +79,38 @@ class TakePhotoScreen extends ConsumerWidget {
                           ),
                         ),
                   GestureDetector(
-                    onTap: !camerasProvider.value!.isSnapping
-                        ? () async {
-                            try {
-                              final date = UtilFunctions.formatDate(DateTime.now());
-                              final time = UtilFunctions.formatTime(DateTime.now());
-                              Position position = await UtilFunctions.determinePosition();
-                              final address = await UtilFunctions.determineAddress(
-                                latitude: position.latitude,
-                                longitude: position.longitude,
+                    onTap: () async {
+                      try {
+                        final File? image = await ref
+                            .read(cameraControllerProvider.notifier)
+                            .takePicture();
+                        if (image != null) {
+                          final date = UtilFunctions.formatDate(DateTime.now());
+                          final time = UtilFunctions.formatTime(DateTime.now());
+                          Position position = await UtilFunctions.determinePosition();
+                          final address = await UtilFunctions.determineAddress(
+                            latitude: position.latitude,
+                            longitude: position.longitude,
+                          );
+                          print(
+                            "date:$date\ntime:$time\nlat:${position.latitude}\nlong:${position.longitude}\naddress:$address\nimage:${image?.path}",
+                          );
+                          ref
+                              .read(photosViewModel.notifier)
+                              .updatePhotosList(
+                                PhotoModel(
+                                  id: const Uuid().v4(),
+                                  date: date,
+                                  time: time,
+                                  localPath: image.path,
+                                  location: address,
+                                ),
                               );
-                              final File image = await ref
-                                  .read(cameraControllerProvider.notifier)
-                                  .takePicture();
-                              print(
-                                "date:$date\ntime:$time\nlat:${position.latitude}\nlong:${position.longitude}\naddress:$address\nimage:${image.path}",
-                              );
-                              ref
-                                  .read(photosViewModel.notifier)
-                                  .updatePhotosList(
-                                    PhotoModel(
-                                      id: const Uuid().v4(),
-                                      date: date,
-                                      time: time,
-                                      localPath: image.path,
-                                      location: address,
-                                    ),
-                                  );
-                            } catch (e, s) {
-                              print("An error occured $e at\n$s");
-                            }
-                          }
-                        : () {
-                            print("ALREADY IN THE PROCESS OF TAKING A PHOTO");
-                          },
+                        }
+                      } catch (e, s) {
+                        print("An error occured $e at\n$s");
+                      }
+                    },
                     child: Container(
                       height: 60,
                       width: 60,

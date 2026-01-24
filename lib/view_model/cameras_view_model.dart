@@ -68,17 +68,26 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
   }
 
   ///Take a photo and save it to the Galleria album on the device.
-  Future<File> takePicture() async {
-    final cameraState = state.value!.withChanges(isSnapping: true);
-    final XFile xFile = await cameraState.controller.takePicture();
-    state = AsyncLoading();
-    final File imageFile = File(xFile.path);
-    state = AsyncValue.data(cameraState.withChanges(isSnapping: false));
-
-    final success = await UtilFunctions.saveImageToDeviceGallery(file: imageFile);
-    if (!success) {
-      throw Exception(AppStrings.failedToSaveImage);
+  Future<File?> takePicture() async {
+    final cameraState = state.value!;
+    // try {
+    File? imageFile;
+    if (!cameraState.controller.value.isTakingPicture) {
+      final XFile xFile = await cameraState.controller.takePicture();
+      imageFile = File(xFile.path);
+      final success = await UtilFunctions.saveImageToDeviceGallery(file: imageFile);
+      if (!success) {
+        throw Exception(AppStrings.failedToSaveImage);
+      }
+    } else {
+      print("ALREADY IN THE PROCESS OF TAKING A PHOTO");
     }
+    // } on CameraException {
+    //   print("ALREADY IN THE PROCESS OF TAKING A PHOTO");
+    // } catch (e, s) {
+    //   print("Error $e occured at $s");
+    // }
+    
     return imageFile;
   }
 }
