@@ -136,6 +136,10 @@ The cloud sync sprint is intentionally scoped as a follow-up to ensure the local
  - ID generation: UUID
 
  - Camera capture sound: audioplayers
+
+ - Required for all Firebase services: firebase_core
+
+ - Uploading and managing files in Firebase Cloud Storage: firebase_storage
   
 ## Next Planned Sprints
 

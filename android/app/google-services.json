@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "568059105449",
+    "project_id": "galleria-25128",
+    "storage_bucket": "galleria-25128.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:568059105449:android:f1112da41cb0cd74b159b8",
+        "android_client_info": {
+          "package_name": "com.example.galleria"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAm1b4R92_8QZSwIDArLvHG8iBaThuXw0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
