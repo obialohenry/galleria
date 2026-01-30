@@ -134,6 +134,8 @@ The cloud sync sprint is intentionally scoped as a follow-up to ensure the local
  - Scan Device Gallery: photo_manager
 
  - ID generation: UUID
+
+ - Camera capture sound: audioplayers
   
 ## Next Planned Sprints
 

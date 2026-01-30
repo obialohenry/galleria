@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/config/app_strings.dart';
@@ -24,12 +25,14 @@ final cameraControllerProvider = AsyncNotifierProvider<CameraControllerProvider,
 
 class CameraControllerProvider extends AsyncNotifier<CameraState> {
   CameraController? _controller;
+  final _player = AudioPlayer();
 
   @override
   FutureOr<CameraState> build() async {
     final cameras = await ref.watch(availableCamerasProvider.future);
     ref.onDispose(() {
       _controller?.dispose();
+      _player.dispose();
     });
 
     return _initializeCamera(cameras: cameras, cameraIndex: 0);
@@ -67,8 +70,14 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
     );
   }
 
+  ///Play camera capture sound.
+  Future<void> sound() async {
+    await _player.play(AssetSource("audio/camera_sound.mp3"));
+  }
+
   ///Take a photo and save it to the Galleria album on the device.
   Future<File?> takePicture() async {
+    await sound();
     final cameraState = state.value!;
     // try {
     File? imageFile;
@@ -87,7 +96,7 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
     // } catch (e, s) {
     //   print("Error $e occured at $s");
     // }
-    
+
     return imageFile;
   }
 }
