@@ -140,6 +140,8 @@ The cloud sync sprint is intentionally scoped as a follow-up to ensure the local
  - Required for all Firebase services: firebase_core
 
  - Uploading and managing files in Firebase Cloud Storage: firebase_storage
+
+ - Anonymous authentication: firebase_auth
   
 ## Next Planned Sprints
 
