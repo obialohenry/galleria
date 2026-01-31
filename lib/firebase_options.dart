@@ -83,4 +83,5 @@ class DefaultFirebaseOptions {
   //   authDomain: 'galleria-25128.firebaseapp.com',
   //   storageBucket: 'galleria-25128.firebasestorage.app',
   // );
+
 }
