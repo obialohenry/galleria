@@ -1,14 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/src/model.dart';
+import 'package:galleria/src/package.dart';
 import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/screens/dashboard_screen.dart';
-import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +10,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ); //Firebase initialization.
-
+  await UtilFunctions.anonymousAuth();
   final appDir = await getApplicationDocumentsDirectory();
   Hive.init(appDir.path);
 

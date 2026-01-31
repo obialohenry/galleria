@@ -1,11 +1,6 @@
 import 'dart:io';
-import 'package:galleria/config/app_strings.dart';
-import 'package:galleria/local_storage/photo_local_db.dart';
-import 'package:gallery_saver_plus/gallery_saver.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:galleria/src/package.dart';
 import 'package:intl/intl.dart';
-import 'package:photo_manager/photo_manager.dart';
 
 class UtilFunctions {
   ///Create an album name on device, and save a file image's path to the created album in the device.
@@ -144,5 +139,37 @@ class UtilFunctions {
         .where((key) => !imagePaths.contains(key.split('/').last))
         .toList();
     PhotosLocalDb().deletePhotos(keysToDelete);
+  }
+
+  ///Handles anonymous authentication.
+  ///
+  ///Checks if user is already signed in, if so, stores the user id. And if
+  ///a user isn't signed in, it signs the user in anonymously and stores the user id.
+  static Future<void> anonymousAuth() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      // User already signed in, use existing account
+      DummyData.userId = currentUser.uid;
+    } else {
+      // No user signed in, create anonymous account
+      try {
+        final userCredential = await FirebaseAuth.instance.signInAnonymously();
+        print("Signed in with temporary account.");
+
+        final user = userCredential.user;
+        if (user != null) {
+          DummyData.userId = user.uid;
+          debugPrint("User ID: ${DummyData.userId}");
+        }
+      } on FirebaseAuthException catch (e) {
+        switch (e.code) {
+          case "operation-not-allowed":
+            print("Anonymous auth hasn't been enabled for this project.");
+            break;
+          default:
+            print("Unknown error: ${e.code.toUpperCase()}");
+        }
+      }
+    }
   }
 }

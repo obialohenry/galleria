@@ -5,4 +5,5 @@ class DummyData {
   static bool syncStatus = false;
   static double? lat;
   static double? long;
+  static String? userId;
 }

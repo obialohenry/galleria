@@ -1,15 +1,11 @@
 import 'dart:io';
-import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/src/config.dart';
 import 'package:galleria/src/model.dart';
+import 'package:galleria/src/package.dart';
 import 'package:galleria/src/screens.dart';
 import 'package:galleria/src/view_model.dart';
 import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:uuid/uuid.dart';
 
 class TakePhotoScreen extends ConsumerWidget {
   const TakePhotoScreen({super.key});
