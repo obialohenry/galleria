@@ -8,16 +8,16 @@ class PhotoModel extends HiveObject {
   String id;
 
   @HiveField(1)
-  String? date;
+  String date;
 
   @HiveField(2)
-  String? time;
+  String time;
 
   @HiveField(3)
-  String? localPath;
+  String localPath;
 
   @HiveField(4)
-  String? location;
+  String location;
 
   @HiveField(5)
   bool isSynced;
@@ -27,11 +27,23 @@ class PhotoModel extends HiveObject {
 
   PhotoModel({
     required this.id,
-    this.date,
-    this.time,
-    this.localPath,
-    this.location,
+    required this.date,
+    required this.time,
+    required this.localPath,
+    required this.location,
     this.isSynced = false,
     this.cloudId,
   });
+
+  PhotoModel withChanges({bool? isSynced, String? cloudId}) {
+    return PhotoModel(
+      id: id,
+      date: date,
+      time: time,
+      localPath: localPath,
+      location: location,
+      isSynced: isSynced ?? this.isSynced,
+      cloudId: cloudId ?? this.cloudId,
+    );
+  }
 }

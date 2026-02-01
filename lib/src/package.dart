@@ -15,3 +15,4 @@ export 'package:flutter_riverpod/flutter_riverpod.dart';
 export 'package:uuid/uuid.dart';
 export 'package:camera/camera.dart';
 export 'package:flutter_image_compress/flutter_image_compress.dart';
+export 'package:firebase_storage/firebase_storage.dart';

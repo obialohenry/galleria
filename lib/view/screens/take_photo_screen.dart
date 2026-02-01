@@ -53,11 +53,11 @@ class TakePhotoScreen extends ConsumerWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PhotoDetailsScreen(
-                                  address: photosProvider.last.location ?? AppStrings.unknownData,
-                                  date: photosProvider.last.date ?? AppStrings.unknownData,
-                                  image: photosProvider.last.localPath ?? AppStrings.unknownData,
+                                  address: photosProvider.last.location,
+                                  date: photosProvider.last.date,
+                                  image: photosProvider.last.localPath,
                                   isSynced: photosProvider.last.isSynced,
-                                  time: photosProvider.last.time ?? AppStrings.unknownData,
+                                  time: photosProvider.last.time,
                                 ),
                               ),
                             );
@@ -68,7 +68,7 @@ class TakePhotoScreen extends ConsumerWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                image: FileImage(File(photosProvider.last.localPath!)),
+                                image: FileImage(File(photosProvider.last.localPath)),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -89,7 +89,7 @@ class TakePhotoScreen extends ConsumerWidget {
                             longitude: position.longitude,
                           );
                           print(
-                            "date:$date\ntime:$time\nlat:${position.latitude}\nlong:${position.longitude}\naddress:$address\nimage:${image?.path}",
+                            "date:$date\ntime:$time\nlat:${position.latitude}\nlong:${position.longitude}\naddress:$address\nimage:${image.path}",
                           );
                           ref
                               .read(photosViewModel.notifier)

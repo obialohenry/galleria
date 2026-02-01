@@ -18,10 +18,10 @@ class PhotoModelAdapter extends TypeAdapter<PhotoModel> {
     };
     return PhotoModel(
       id: fields[0] as String,
-      date: fields[1] as String?,
-      time: fields[2] as String?,
-      localPath: fields[3] as String?,
-      location: fields[4] as String?,
+      date: fields[1] as String,
+      time: fields[2] as String,
+      localPath: fields[3] as String,
+      location: fields[4] as String,
       isSynced: fields[5] as bool,
       cloudId: fields[6] as String?,
     );
