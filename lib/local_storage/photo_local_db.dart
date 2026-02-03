@@ -42,4 +42,13 @@ class PhotosLocalDb {
   Future<void> deletePhotos(List<dynamic> keys) async {
     await _box.deleteAll(keys);
   }
+
+  Future<void> updateAPhotoInLocalDb(PhotoModel photo) async {
+    try {
+      await _box.put(photo.localPath, photo);
+      print("Successfully updated photo in hive.");
+    } catch (e, s) {
+      print("An error occured: $e at\n$s");
+    }
+  }
 }

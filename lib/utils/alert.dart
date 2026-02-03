@@ -5,6 +5,7 @@ import 'package:galleria/view/components/app_text.dart';
 void comingSoonDialog(BuildContext context) {
   showDialog(
     context: context,
+    barrierDismissible: false,
     builder: (context) {
       return AlertDialog(
         backgroundColor: AppColors.kSurfaceAlert,
@@ -20,6 +21,25 @@ void comingSoonDialog(BuildContext context) {
         ),
           ),
         ],
+      );
+    },
+  );
+}
+
+void syncProcessDialog(BuildContext context, {required String title}) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        backgroundColor: AppColors.kSurfaceAlert,
+        constraints: BoxConstraints(maxHeight: 200, maxWidth: 400),
+        title: AppText(text: title, color: AppColors.kContentAlert, fontWeight: FontWeight.w600),
+        content: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.kBackgroundPrimary),
+          ),
+        ),
       );
     },
   );

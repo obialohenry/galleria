@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/src/config.dart';
-import 'package:galleria/utils/alert.dart';
+import 'package:galleria/src/view_model.dart';
 import 'package:galleria/view/components/app_text.dart';
 
-class PhotoDetailsScreen extends StatelessWidget {
+class PhotoDetailsScreen extends ConsumerWidget {
   const PhotoDetailsScreen({
     super.key,
     required this.image,
@@ -12,14 +13,17 @@ class PhotoDetailsScreen extends StatelessWidget {
     required this.date,
     required this.time,
     required this.isSynced,
+    required this.id,
   });
+  final String id;
   final String image;
   final String date;
   final String time;
   final String address;
   final bool isSynced;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(photosViewModel);
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
@@ -50,25 +54,29 @@ class PhotoDetailsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Visibility(
-                    visible: !isSynced,
-                    replacement: AppText(text: AppStrings.synced, fontWeight: FontWeight.w700),
-                    child: GestureDetector(
-                      onTap: () {
-                        comingSoonDialog(context);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: AppColors.kBackgroundSecondary,
-                        ),
-                        child: AppText(
-                          text: AppStrings.syncPhoto,
-                          color: AppColors.kPrimaryPressed,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
+                  GestureDetector(
+                    onTap: () {
+                      !isSynced
+                          ? ref
+                                .watch(cloudSyncViewModel.notifier)
+                                .syncPhoto(context, file: File(image), photoId: id)
+                          : print("THIS PHOTO IS ALREADY SYNCED");
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: !isSynced
+                            ? ref.read(cloudSyncViewModel.notifier).syncButtonColor()
+                            : AppColors.kSuccess,
+                      ),
+                      child: AppText(
+                        text: !isSynced
+                            ? ref.read(cloudSyncViewModel.notifier).syncButtonActionText()
+                            : AppStrings.synced,
+                        color: AppColors.kPrimaryPressed,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
                       ),
                     ),
                   ),

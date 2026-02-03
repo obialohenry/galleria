@@ -53,6 +53,7 @@ class TakePhotoScreen extends ConsumerWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PhotoDetailsScreen(
+                                  id: photosProvider.last.id,
                                   address: photosProvider.last.location,
                                   date: photosProvider.last.date,
                                   image: photosProvider.last.localPath,

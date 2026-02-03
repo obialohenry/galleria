@@ -22,4 +22,10 @@ class PhotosViewModel extends Notifier<List<PhotoModel>> {
       state = newList;
     }
   }
+
+  PhotoModel updateAPhoto({required String photoId, required String cloudReferenceId}) {
+    final index = state.map((photo) => photo.id).toList().indexOf(photoId);
+    final photo = state[index];
+    return photo.withChanges(isSynced: true, cloudId: cloudReferenceId);
+  }
 }

@@ -174,35 +174,5 @@ class UtilFunctions {
     }
   }
 
-  ///Compresses a photo file.
-  ///
-  ///parameters:
-  ///- file: The File object to be compressed.
-  ///
-  ///This method compresses a file to 1280x720, and saves the compressed image temporarily on the device
-  ///in a timestamp-based naming format.
-  ///It then return the compressed file when successful, or a null value when the process fails.
-  static Future<File?> compressPhoto(File file) async {
-    final tempDir = await getTemporaryDirectory();
-    final targetPath = "$tempDir/photo_${DateTime.now().millisecondsSinceEpoch}.jpg";
-    File? compressedFile;
-    try {
-      final result = await FlutterImageCompress.compressAndGetFile(
-        file.absolute.path,
-        targetPath,
-        minWidth: 1280,
-        minHeight: 720,
-        quality: 88,
-      );
-      if (result != null) {
-        compressedFile = File(result.path);
-        print("Original File: ${file.lengthSync()}");
-        print("Compressed File: ${compressedFile.lengthSync()}");
-      }
-    } catch (e, s) {
-      print("An error occurred $e at $s");
-    }
-
-    return compressedFile;
-  }
+  
 }
