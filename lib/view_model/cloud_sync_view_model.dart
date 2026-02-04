@@ -38,15 +38,16 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
         targetPath,
         minWidth: 1280,
         minHeight: 720,
-        quality: 88,
+        quality: AppConstants.kCompressionQuality,
       );
       if (result != null) {
         compressedFile = File(result.path);
-        print("Original File: ${file.lengthSync()}");
-        print("Compressed File: ${compressedFile.lengthSync()}");
+        debugPrint("Original File: ${file.lengthSync()}");
+        debugPrint("Compressed File: ${compressedFile.lengthSync()}");
       }
     } catch (e, s) {
-      throw ("An error occurred during compression $e at $s");
+      debugPrint("An error occurred during compression $e at $s");
+      return null;
     }
 
     return compressedFile;
@@ -73,15 +74,19 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       uploadingPhoto.snapshotEvents.listen((TaskSnapshot snapshot) {
         // Calculate progress
         _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+        state = PhotoSyncState.uploading;
       });
       await uploadingPhoto;
       downloadUrl = await photosRef.getDownloadURL();
       // Upload successful, delete the temporary file
       await file.delete();
     } on FirebaseException catch (e) {
-      _uploadExceptions(e.code);
+      await file.delete();
+      _errorMessage = _uploadExceptions(e.code);
+      return null;
     } catch (e, s) {
-      throw ("An error occurred during upload $e at $s");
+      debugPrint("An error occurred during upload $e at $s");
+      return null;
     }
     return downloadUrl;
   }
@@ -92,85 +97,83 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     required String photoId,
   }) async {
     try {
-      final String? photoCloudReference;
+
       //Compressing photo.
       state = PhotoSyncState.compressing;
       //Syncing process dialog.
       syncProcessDialog(context, title: _syncStateTitle(), content: _syncProcessContent());
+
       final compressedPhoto = await compressPhoto(file);
-
-      if (compressedPhoto != null) {
-        //Uploading photo to cloud.
-        state = PhotoSyncState.uploading;
-        photoCloudReference = await uploadPhotoToCloud(compressedPhoto);
-
-        if (photoCloudReference != null) {
-          //Success
-          state = PhotoSyncState.success;
-          print("PHOTO SYNCED SUCCESSFULLY");
-          final photo = ref
-              .read(photosViewModel.notifier)
-              .updateAPhoto(photoId: photoId, cloudReferenceId: photoCloudReference);
-          PhotosLocalDb().updateAPhotoInLocalDb(photo);
-
-          //Pops off loading dialog
-          Future.delayed(Duration(milliseconds: 100), () {
-            // ignore: use_build_context_synchronously
-            Navigator.pop(context);
-          });
-
-          ///`OR`
-          //TODO: SHOW SUCCESS TOAST TO USER.
-        }
+      if (compressedPhoto == null) {
+        _errorMessage = AppStrings.failedToCompressPhoto;
+        state = PhotoSyncState.error;
+        //Pops off sync process dialog
+        if (context.mounted) Navigator.pop(context);
+        return;
       }
+
+      //Uploading photo to cloud.
+      state = PhotoSyncState.uploading;
+      final downloadUrl = await uploadPhotoToCloud(compressedPhoto);
+
+      if (downloadUrl == null) {
+        state = PhotoSyncState.error;
+        if (context.mounted) Navigator.pop(context);
+        return;
+      }
+      //Success
+      state = PhotoSyncState.success;
+      debugPrint("PHOTO SYNCED SUCCESSFULLY");
+      final updatedPhoto = ref
+          .read(photosViewModel.notifier)
+          .updateAPhoto(photoId: photoId, cloudReferenceId: downloadUrl);
+      await PhotosLocalDb().updateAPhotoInLocalDb(updatedPhoto);
+
+      //Pops off sync process dialog
+      if (context.mounted) {
+        Navigator.pop(context);
+        }
+      
     } catch (e) {
       state = PhotoSyncState.error;
       _errorMessage = e.toString();
-      print(e);
+      debugPrint(e.toString());
 
-      //Pops off loading dialog
-      Future.delayed(Duration(milliseconds: 400), () {
-        // ignore: use_build_context_synchronously
+      //Pops off sync process dialog
+      if (context.mounted) {
         Navigator.pop(context);
-      });
-
-      ///`OR`
-      //TODO: SHOW FAILURE TOAST TO USER.
+      }
     }
   }
 
   String _syncStateTitle() {
-    String message = switch (state) {
+    return switch (state) {
       PhotoSyncState.compressing => AppStrings.compressingPhoto,
       PhotoSyncState.uploading => AppStrings.uploadingToCloud,
       PhotoSyncState.success => AppStrings.photoSyncedSuccessfully,
       PhotoSyncState.error => AppStrings.syncFailed,
       _ => "",
     };
-    return message;
   }
 
   Color syncButtonColor() {
-    Color buttonColor = switch (state) {
+    return switch (state) {
       PhotoSyncState.idle || PhotoSyncState.error => AppColors.kPrimary,
       PhotoSyncState.compressing || PhotoSyncState.uploading => AppColors.kPending,
       PhotoSyncState.success => AppColors.kSuccess,
     };
-    return buttonColor;
   }
 
   String syncButtonActionText() {
-    String text = switch (state) {
+    return switch (state) {
       PhotoSyncState.idle || PhotoSyncState.error => AppStrings.syncPhoto,
-      PhotoSyncState.compressing => AppStrings.syncPhoto,
-      PhotoSyncState.uploading => AppStrings.syncPhoto,
+      PhotoSyncState.compressing || PhotoSyncState.uploading => AppStrings.syncing,
       PhotoSyncState.success => AppStrings.synced,
     };
-    return text;
   }
 
   Widget _syncProcessContent() {
-    Widget content = switch (state) {
+    return switch (state) {
       PhotoSyncState.idle => const SizedBox.shrink(),
       PhotoSyncState.compressing => Center(
         child: CircularProgressIndicator(
@@ -197,23 +200,16 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
         ],
       ),
     };
-    return content;
   }
 
-  void _uploadExceptions(String error) {
-    switch (error) {
-      case 'storage/unauthorized':
-        throw ("You don't have permission to upload");
-      case 'storage/unknown':
-        throw ("Upload failed. Check your internet connection");
-      case 'storage/quota-exceeded':
-        throw ("Storage limit reached");
-      case 'storage/invalid-checksum':
-        throw ("File corrupted during upload");
-      case 'storage/retry-limit-exceeded':
-        throw ("Too many retries, likely network issue");
-      default:
-        throw ("An error occurred on Firebase $error");
-    }
+  String _uploadExceptions(String error) {
+    return switch (error) {
+      'storage/unauthorized' => "You don't have permission to upload",
+      'storage/unknown' => "Upload failed. Check your internet connection",
+      'storage/quota-exceeded' => "Storage limit reached",
+      'storage/invalid-checksum' => "File corrupted during upload",
+      'storage/retry-limit-exceeded' => "Too many retries, likely network issue",
+      _ => "An error occurred on Firebase $error",
+    };
   }
 }

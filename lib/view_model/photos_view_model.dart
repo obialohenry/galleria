@@ -30,11 +30,18 @@ class PhotosViewModel extends Notifier<List<PhotoModel>> {
   ///- cloudReferenceId: The dowloadable URL of a photo item, gotten after a successful upload to the cloud.
   ///
   ///This get's the index of a photo item in the list of photos state.
-  ///It then uses the index to get the photo item from the list, updating the [isSynced] and [cloudId] status of the item, and returning the updated photo item.
+  ///It then uses the index to get the photo item from the list, updating the [isSynced] and [cloudId] status of the item, updates the state list, and returning the updated photo item.
   ///The [cloudId] status is updated with the cloudReferenceId argument.
   PhotoModel updateAPhoto({required String photoId, required String cloudReferenceId}) {
-    final index = state.map((photo) => photo.id).toList().indexOf(photoId);
-    final photo = state[index];
-    return photo.withChanges(isSynced: true, cloudId: cloudReferenceId);
+    final index = state.indexWhere((photo) => photo.id == photoId);
+
+    final updatedPhoto = state[index].withChanges(isSynced: true, cloudId: cloudReferenceId);
+
+    final newList = [...state];
+    newList[index] = updatedPhoto;
+
+    state = newList;
+
+    return updatedPhoto;
   }
 }

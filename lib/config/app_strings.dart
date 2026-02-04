@@ -14,6 +14,8 @@ class AppStrings {
   static const uploadingToCloud = "Uploading to cloud";
   static const photoSyncedSuccessfully = "Photo synced successfully!";
   static const syncFailed = "Sync failed.";
+  static const syncing = "Syncing";
+  static const failedToCompressPhoto = "Failed to compress photo";
   static const thisFeatureIsUnderDevelopment =
       "This feature is under development and will be available soon.";
   static const okay = "Okay";
