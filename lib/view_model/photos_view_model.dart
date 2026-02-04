@@ -23,6 +23,15 @@ class PhotosViewModel extends Notifier<List<PhotoModel>> {
     }
   }
 
+  ///Update a photo item's metadata, and return the Updated photo item.
+  ///
+  ///parameters:
+  ///- photoId: A photo item's unique ID.
+  ///- cloudReferenceId: The dowloadable URL of a photo item, gotten after a successful upload to the cloud.
+  ///
+  ///This get's the index of a photo item in the list of photos state.
+  ///It then uses the index to get the photo item from the list, updating the [isSynced] and [cloudId] status of the item, and returning the updated photo item.
+  ///The [cloudId] status is updated with the cloudReferenceId argument.
   PhotoModel updateAPhoto({required String photoId, required String cloudReferenceId}) {
     final index = state.map((photo) => photo.id).toList().indexOf(photoId);
     final photo = state[index];

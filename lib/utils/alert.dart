@@ -26,7 +26,7 @@ void comingSoonDialog(BuildContext context) {
   );
 }
 
-void syncProcessDialog(BuildContext context, {required String title}) {
+void syncProcessDialog(BuildContext context, {required String title, required Widget content}) {
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -35,11 +35,7 @@ void syncProcessDialog(BuildContext context, {required String title}) {
         backgroundColor: AppColors.kSurfaceAlert,
         constraints: BoxConstraints(maxHeight: 200, maxWidth: 400),
         title: AppText(text: title, color: AppColors.kContentAlert, fontWeight: FontWeight.w600),
-        content: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.kBackgroundPrimary),
-          ),
-        ),
+        content: content,
       );
     },
   );

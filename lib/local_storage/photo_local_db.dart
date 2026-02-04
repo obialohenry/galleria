@@ -39,10 +39,13 @@ class PhotosLocalDb {
     }
   }
 
+  ///Deletes a list of photos using there keys.
+  ///parameter; keys: List of keys/photo objects to be deleted.
   Future<void> deletePhotos(List<dynamic> keys) async {
     await _box.deleteAll(keys);
   }
 
+  //Updates the metadata of photo stored in the local Database.
   Future<void> updateAPhotoInLocalDb(PhotoModel photo) async {
     try {
       await _box.put(photo.localPath, photo);
