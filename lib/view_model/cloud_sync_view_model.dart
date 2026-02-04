@@ -117,6 +117,7 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       final downloadUrl = await uploadPhotoToCloud(compressedPhoto);
 
       if (downloadUrl == null) {
+        _errorMessage = AppStrings.syncFailed;
         state = PhotoSyncState.error;
         if (context.mounted) Navigator.pop(context);
         return;
