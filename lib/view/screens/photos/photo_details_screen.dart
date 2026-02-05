@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/src/config.dart';
 import 'package:galleria/src/view_model.dart';
@@ -14,6 +15,7 @@ class PhotoDetailsScreen extends ConsumerWidget {
     required this.time,
     required this.isSynced,
     required this.id,
+    required this.cloudReferenceUrl,
   });
   final String id;
   final String image;
@@ -21,6 +23,7 @@ class PhotoDetailsScreen extends ConsumerWidget {
   final String time;
   final String address;
   final bool isSynced;
+  final String? cloudReferenceUrl;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(photosViewModel);
@@ -60,7 +63,7 @@ class PhotoDetailsScreen extends ConsumerWidget {
                           ? ref
                                 .watch(cloudSyncViewModel.notifier)
                                 .syncPhoto(context, file: File(image), photoId: id)
-                          : print("THIS PHOTO IS ALREADY SYNCED");
+                          : debugPrint("THIS PHOTO IS ALREADY SYNCED");
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -101,10 +104,57 @@ class PhotoDetailsScreen extends ConsumerWidget {
                   AppText(text: AppStrings.location, fontWeight: FontWeight.w700),
                   SizedBox(height: 5),
                   AppText(text: address, color: AppColors.kTextSecondary),
+                  Visibility(
+                    visible: cloudReferenceUrl != null,
+                    child: Column(
+                      children: [
                   SizedBox(height: 10),
-                  AppText(text: AppStrings.localPath, fontWeight: FontWeight.w700),
+                        AppText(text: AppStrings.cloudUrl, fontWeight: FontWeight.w700),
                   SizedBox(height: 5),
-                  AppText(text: image, color: AppColors.kTextSecondary),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: AppText(
+                                text: cloudReferenceUrl!,
+                                color: AppColors.kTextSecondary,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () {
+                                Clipboard.setData(ClipboardData(text: cloudReferenceUrl!));
+
+                                ScaffoldMessenger.of(context).clearSnackBars();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    backgroundColor: AppColors.kSuccess,
+                                    content: AppText(
+                                      text: AppStrings.successfullyCopied,
+                                      color: AppColors.kTextSecondary,
+                                    ),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppColors.kSuccess),
+                                ),
+                                child: AppText(
+                                  text: AppStrings.copy,
+                                  color: AppColors.kSurfaceAlert,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

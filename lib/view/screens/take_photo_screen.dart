@@ -59,6 +59,7 @@ class TakePhotoScreen extends ConsumerWidget {
                                   image: photosProvider.last.localPath,
                                   isSynced: photosProvider.last.isSynced,
                                   time: photosProvider.last.time,
+                                  cloudReferenceUrl: photosProvider.last.cloudId,
                                 ),
                               ),
                             );

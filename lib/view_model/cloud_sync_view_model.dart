@@ -91,13 +91,24 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     return downloadUrl;
   }
 
+  ///Sync a photo file to the cloud.
+  ///
+  ///parameters:
+  ///- file: Photo file to be compressed and uploaded to Firebase storage.
+  ///- photoId: Unique id of the photo object.
+  ///
+  ///This method starts the syncing process by compressing the photo file using the `compressPhoto` method,
+  ///after which it then uploads the photo file to Firebase cloud storage using the `uploadPhotoToCloud` method.
+  ///The entire sync process is properly communicated to the user, using a dialog display.
+  ///Each process handles failure state by displaying an error message and stoping the entire sync process.
+  ///When successfull, a cloud reference URL for the photo file will be displayed on screen, and the photo object metadata
+  ///will be updated at both runtime and on the device local storage.
   Future<void> syncPhoto(
     BuildContext context, {
     required File file,
     required String photoId,
   }) async {
     try {
-
       //Compressing photo.
       state = PhotoSyncState.compressing;
       //Syncing process dialog.
@@ -115,6 +126,7 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       //Uploading photo to cloud.
       state = PhotoSyncState.uploading;
       final downloadUrl = await uploadPhotoToCloud(compressedPhoto);
+      debugPrint("DOWNLOAD URL: $downloadUrl");
 
       if (downloadUrl == null) {
         _errorMessage = AppStrings.syncFailed;
@@ -133,8 +145,7 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       //Pops off sync process dialog
       if (context.mounted) {
         Navigator.pop(context);
-        }
-      
+      }
     } catch (e) {
       state = PhotoSyncState.error;
       _errorMessage = e.toString();
@@ -147,6 +158,9 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     }
   }
 
+  /// Returns the feedback dialog title for each sync process state.
+  ///
+  /// Sync states includes; idle, compressing, uploading, success, error.
   String _syncStateTitle() {
     return switch (state) {
       PhotoSyncState.compressing => AppStrings.compressingPhoto,
@@ -157,6 +171,9 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     };
   }
 
+  /// Changes the sync photo action buttons colour based on the sync process state.
+  ///
+  /// Sync states includes; idle, compressing, uploading, success, error.
   Color syncButtonColor() {
     return switch (state) {
       PhotoSyncState.idle || PhotoSyncState.error => AppColors.kPrimary,
@@ -165,6 +182,9 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     };
   }
 
+  /// Changes the sync photo action buttons text based on the sync process state.
+  ///
+  /// Sync states includes; idle, compressing, uploading, success, error.
   String syncButtonActionText() {
     return switch (state) {
       PhotoSyncState.idle || PhotoSyncState.error => AppStrings.syncPhoto,
@@ -173,6 +193,9 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     };
   }
 
+  /// Returns the feedback dialog content for each sync process state.
+  ///
+  /// Sync states includes; idle, compressing, uploading, success, error.
   Widget _syncProcessContent() {
     return switch (state) {
       PhotoSyncState.idle => const SizedBox.shrink(),

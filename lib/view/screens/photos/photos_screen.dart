@@ -42,6 +42,7 @@ class PhotosScreen extends ConsumerWidget {
                             image: aGridPhoto.localPath,
                             isSynced: aGridPhoto.isSynced,
                             time: aGridPhoto.time,
+                            cloudReferenceUrl: aGridPhoto.cloudId,
                           ),
                         ),
                       );
@@ -52,7 +53,7 @@ class PhotosScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         image: DecorationImage(
-                          image: FileImage(File(aGridPhoto.localPath!)),
+                          image: FileImage(File(aGridPhoto.localPath)),
                           fit: BoxFit.cover,
                         ),
                       ),

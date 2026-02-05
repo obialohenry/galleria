@@ -5,6 +5,7 @@ class AppStrings {
   static const synced = "Synced";
   static const location = "Location";
   static const localPath = "Local Path";
+  static const cloudUrl = "Cloud URL";
   static const failedToSaveImage = "Failed to save image to gallery";
   static const unknownLocation = "Unknown location";
   static const unknownData = "Unknown Data";
@@ -15,6 +16,8 @@ class AppStrings {
   static const photoSyncedSuccessfully = "Photo synced successfully!";
   static const syncFailed = "Sync failed.";
   static const syncing = "Syncing";
+  static const copy = "Copy";
+  static const successfullyCopied = "Successfully copied";
   static const failedToCompressPhoto = "Failed to compress photo";
   static const thisFeatureIsUnderDevelopment =
       "This feature is under development and will be available soon.";
