@@ -29,28 +29,30 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
   ///in a timestamp-based naming format.
   ///It then return the compressed file when successful, or a null value when the process fails.
   Future<File?> compressPhoto(File file) async {
+    debugPrint("COMPRESSING: ${file.path}");
+    debugPrint("File exists: ${file.existsSync()}");
+
     final tempDir = await getTemporaryDirectory();
-    final targetPath = "$tempDir/photo_${DateTime.now().millisecondsSinceEpoch}.jpg";
-    File? compressedFile;
-    try {
+    debugPrint("Temp directory: ${tempDir.path}");
+    final targetPath = "${tempDir.path}/photo_${DateTime.now().millisecondsSinceEpoch}.jpg";
+    debugPrint("Target path: $targetPath");
       final result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path,
         targetPath,
-        minWidth: 1280,
-        minHeight: 720,
+      // minWidth: 1280,
+      // minHeight: 720,
         quality: AppConstants.kCompressionQuality,
       );
+    debugPrint("Compression result: ${result?.path ?? 'NULL'}");
       if (result != null) {
-        compressedFile = File(result.path);
+      File compressedFile = File(result.path);
         debugPrint("Original File: ${file.lengthSync()}");
         debugPrint("Compressed File: ${compressedFile.lengthSync()}");
-      }
-    } catch (e, s) {
-      debugPrint("An error occurred during compression $e at $s");
+      return compressedFile;
+    } else {
+      debugPrint("Compression returned null");
       return null;
     }
-
-    return compressedFile;
   }
 
   ///Uploads a photo to cloud storage, returning a downloadable URL.
@@ -69,7 +71,10 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     final photosRef = storageRef.child("photos/${DummyData.userId}/${path.basename(file.path)}");
 
     try {
-      final uploadingPhoto = photosRef.putFile(file);
+      //Tells Firebase and browser that this is a JPEG image.
+      final metadata = SettableMetadata(contentType: 'image/jpeg');
+
+      final uploadingPhoto = photosRef.putFile(file, metadata);
 
       uploadingPhoto.snapshotEvents.listen((TaskSnapshot snapshot) {
         // Calculate progress
@@ -80,15 +85,14 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       downloadUrl = await photosRef.getDownloadURL();
       // Upload successful, delete the temporary file
       await file.delete();
+      return downloadUrl;
+      
     } on FirebaseException catch (e) {
       await file.delete();
       _errorMessage = _uploadExceptions(e.code);
+      debugPrint("Firebase error: ${e.code} - ${e.message}");
       return null;
-    } catch (e, s) {
-      debugPrint("An error occurred during upload $e at $s");
-      return null;
-    }
-    return downloadUrl;
+    } 
   }
 
   ///Sync a photo file to the cloud.
@@ -228,6 +232,7 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
 
   String _uploadExceptions(String error) {
     return switch (error) {
+      'storage/object-not-found' => "Upload path not found. Please try again",
       'storage/unauthorized' => "You don't have permission to upload",
       'storage/unknown' => "Upload failed. Check your internet connection",
       'storage/quota-exceeded' => "Storage limit reached",

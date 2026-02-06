@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/src/config.dart';
 import 'package:galleria/src/view_model.dart';
+import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
 
 class PhotoDetailsScreen extends ConsumerWidget {
@@ -108,32 +108,23 @@ class PhotoDetailsScreen extends ConsumerWidget {
                     visible: cloudReferenceUrl != null,
                     child: Column(
                       children: [
-                  SizedBox(height: 10),
+                        SizedBox(height: 10),
                         AppText(text: AppStrings.cloudUrl, fontWeight: FontWeight.w700),
-                  SizedBox(height: 5),
+                        SizedBox(height: 5),
                         Row(
                           children: [
                             Expanded(
                               child: AppText(
-                                text: cloudReferenceUrl!,
+                                text: cloudReferenceUrl ?? AppStrings.unknownData,
                                 color: AppColors.kTextSecondary,
                               ),
                             ),
                             SizedBox(width: 10),
                             GestureDetector(
                               onTap: () {
-                                Clipboard.setData(ClipboardData(text: cloudReferenceUrl!));
-
-                                ScaffoldMessenger.of(context).clearSnackBars();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: AppColors.kSuccess,
-                                    content: AppText(
-                                      text: AppStrings.successfullyCopied,
-                                      color: AppColors.kTextSecondary,
-                                    ),
-                                    duration: Duration(seconds: 2),
-                                  ),
+                                UtilFunctions.copyToClipBoard(
+                                  context,
+                                  value: cloudReferenceUrl ?? "",
                                 );
                               },
                               child: Container(

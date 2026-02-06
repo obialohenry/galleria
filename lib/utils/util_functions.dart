@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:galleria/src/config.dart';
 import 'package:galleria/src/package.dart';
+import 'package:galleria/view/components/app_text.dart';
 import 'package:intl/intl.dart';
 
 class UtilFunctions {
@@ -174,5 +176,16 @@ class UtilFunctions {
     }
   }
 
-  
+  static void copyToClipBoard(BuildContext context, {required String value}) {
+    Clipboard.setData(ClipboardData(text: value));
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: AppColors.kSuccess,
+        content: AppText(text: AppStrings.successfullyCopied, color: AppColors.kTextSecondary),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
 }
