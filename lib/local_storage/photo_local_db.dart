@@ -47,11 +47,7 @@ class PhotosLocalDb {
 
   //Updates the metadata of photo stored in the local Database.
   Future<void> updateAPhotoInLocalDb(PhotoModel photo) async {
-    try {
-      await _box.put(photo.localPath, photo);
-      print("Successfully updated photo in hive.");
-    } catch (e, s) {
-      print("An error occured: $e at\n$s");
-    }
+    await _box.put(photo.localPath, photo);
+    print("Successfully updated photo in hive.");
   }
 }

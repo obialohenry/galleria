@@ -39,8 +39,8 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       final result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path,
         targetPath,
-      // minWidth: 1280,
-      // minHeight: 720,
+      minWidth: 1280,
+      minHeight: 720,
         quality: AppConstants.kCompressionQuality,
       );
     debugPrint("Compression result: ${result?.path ?? 'NULL'}");
@@ -83,7 +83,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       });
       await uploadingPhoto;
       downloadUrl = await photosRef.getDownloadURL();
-      // Upload successful, delete the temporary file
       await file.delete();
       return downloadUrl;
       
@@ -115,7 +114,7 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     try {
       //Compressing photo.
       state = PhotoSyncState.compressing;
-      //Syncing process dialog.
+
       syncProcessDialog(context, title: _syncStateTitle(), content: _syncProcessContent());
 
       final compressedPhoto = await compressPhoto(file);
@@ -133,7 +132,9 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       debugPrint("DOWNLOAD URL: $downloadUrl");
 
       if (downloadUrl == null) {
-        _errorMessage = AppStrings.syncFailed;
+        if (_errorMessage.isEmpty) {
+          _errorMessage = AppStrings.failedToUploadToCloud;
+        }
         state = PhotoSyncState.error;
         if (context.mounted) Navigator.pop(context);
         return;

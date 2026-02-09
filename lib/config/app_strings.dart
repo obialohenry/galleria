@@ -15,6 +15,7 @@ class AppStrings {
   static const uploadingToCloud = "Uploading to cloud";
   static const photoSyncedSuccessfully = "Photo synced successfully!";
   static const syncFailed = "Sync failed.";
+  static const failedToUploadToCloud = "Failed to upload to cloud";
   static const syncing = "Syncing";
   static const copy = "Copy";
   static const successfullyCopied = "Successfully copied";
