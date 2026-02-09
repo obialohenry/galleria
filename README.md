@@ -96,19 +96,18 @@ The gallery_saver_plus plugin requires additional iOS configuration within the P
 
 Because development was done on Windows, the iOS-specific Podfile setup could not be applied or tested locally. This configuration step is documented here for reviewers and future setup on macOS.
 
-### Sprint 2 – Cloud Synchronization (Planned)
+### Sprint 2 – Cloud Synchronization
+This sprint focused on syncing a single image file with the cloud using Firebase (Firebase storage).
 
-Cloud synchronization is outlined as the next sprint in this project but has **not yet been implemented** in this submission.
+#### Known Issues & Observations (Sprint 2)
+The following bahaviors were observed during testing and are documented for transparency:
 
-The current implementation focuses on:
-- Local photo capture
-- Local gallery storage
-- Metadata persistence using Hive
-- Gallery-to-database reconciliation
+#### Platform-Specific Notes
 
-The cloud sync sprint is intentionally scoped as a follow-up to ensure the local data flow is correct and stable before introducing remote state.
+##### iOS (Firebase configuration)
+The Firebase plugins requires additional iOS configuration within the Podfile to function correctly.
 
-
+Because development was done on Windows, the iOS-specific Podfile setup could not be applied or tested locally. This configuration step is documented here for reviewers and future setup on macOS.
 
 ## Tech Stack & Decisions
  - Flutter – Cross-platform mobile framework
@@ -142,20 +141,12 @@ The cloud sync sprint is intentionally scoped as a follow-up to ensure the local
  - Uploading and managing files in Firebase Cloud Storage: firebase_storage
 
  - Anonymous authentication: firebase_auth
+
+ - Compress image file's: flutter_image_compress
   
 ## Next Planned Sprints
 
-- Cloud synchronization (Firebase)
-
 - Batch and scheduled sync
-
-## Trade-offs
-
-- Cloud synchronization was intentionally deferred to focus on a stable local capture pipeline.
-
-- iOS gallery configuration was documented but not executed due to OS limitations.
-
-- UI prioritizes clarity and functionality over visual polish at this stage.
 
 ## Setup Instructions
 
