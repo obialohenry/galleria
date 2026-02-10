@@ -7,26 +7,11 @@ import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
 
 class PhotoDetailsScreen extends ConsumerWidget {
-  const PhotoDetailsScreen({
-    super.key,
-    required this.image,
-    required this.address,
-    required this.date,
-    required this.time,
-    required this.isSynced,
-    required this.id,
-    required this.cloudReferenceUrl,
-  });
-  final String id;
-  final String image;
-  final String date;
-  final String time;
-  final String address;
-  final bool isSynced;
-  final String? cloudReferenceUrl;
+  const PhotoDetailsScreen({super.key, required this.index});
+  final int index;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(photosViewModel);
+    final photosProvider = ref.watch(photosViewModel);
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
@@ -51,30 +36,38 @@ class PhotoDetailsScreen extends ConsumerWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AppText(text: date, fontWeight: FontWeight.w700),
-                          AppText(text: time, color: AppColors.kTextSecondary, fontSize: 14),
+                          AppText(text: photosProvider[index].date, fontWeight: FontWeight.w700),
+                          AppText(
+                            text: photosProvider[index].time,
+                            color: AppColors.kTextSecondary,
+                            fontSize: 14,
+                          ),
                         ],
                       ),
                     ],
                   ),
                   GestureDetector(
                     onTap: () {
-                      !isSynced
+                      !photosProvider[index].isSynced
                           ? ref
                                 .watch(cloudSyncViewModel.notifier)
-                                .syncPhoto(context, file: File(image), photoId: id)
+                                .syncPhoto(
+                                  context,
+                                  file: File(photosProvider[index].localPath),
+                                  photoId: photosProvider[index].id,
+                                )
                           : debugPrint("THIS PHOTO IS ALREADY SYNCED");
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: !isSynced
+                        color: !photosProvider[index].isSynced
                             ? ref.read(cloudSyncViewModel.notifier).syncButtonColor()
                             : AppColors.kSuccess,
                       ),
                       child: AppText(
-                        text: !isSynced
+                        text: !photosProvider[index].isSynced
                             ? ref.read(cloudSyncViewModel.notifier).syncButtonActionText()
                             : AppStrings.synced,
                         color: AppColors.kPrimaryPressed,
@@ -91,7 +84,10 @@ class PhotoDetailsScreen extends ConsumerWidget {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: FileImage(File(image)), fit: BoxFit.cover),
+                  image: DecorationImage(
+                    image: FileImage(File(photosProvider[index].localPath)),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -103,9 +99,9 @@ class PhotoDetailsScreen extends ConsumerWidget {
                   SizedBox(height: 10),
                   AppText(text: AppStrings.location, fontWeight: FontWeight.w700),
                   SizedBox(height: 5),
-                  AppText(text: address, color: AppColors.kTextSecondary),
+                  AppText(text: photosProvider[index].location, color: AppColors.kTextSecondary),
                   Visibility(
-                    visible: cloudReferenceUrl != null,
+                    visible: photosProvider[index].cloudId != null,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -118,7 +114,7 @@ class PhotoDetailsScreen extends ConsumerWidget {
                               onTap: () {
                                 UtilFunctions.copyToClipBoard(
                                   context,
-                                  value: cloudReferenceUrl ?? "",
+                                  value: photosProvider[index].cloudId ?? "",
                                 );
                               },
                               child: Container(

@@ -36,13 +36,7 @@ class PhotosScreen extends ConsumerWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => PhotoDetailsScreen(
-                            id: aGridPhoto.id,
-                            address: aGridPhoto.location,
-                            date: aGridPhoto.date,
-                            image: aGridPhoto.localPath,
-                            isSynced: aGridPhoto.isSynced,
-                            time: aGridPhoto.time,
-                            cloudReferenceUrl: aGridPhoto.cloudId,
+                            index: index,
                           ),
                         ),
                       );
