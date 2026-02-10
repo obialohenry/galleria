@@ -107,19 +107,13 @@ class PhotoDetailsScreen extends ConsumerWidget {
                   Visibility(
                     visible: cloudReferenceUrl != null,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 10),
-                        AppText(text: AppStrings.cloudUrl, fontWeight: FontWeight.w700),
-                        SizedBox(height: 5),
                         Row(
                           children: [
-                            Expanded(
-                              child: AppText(
-                                text: cloudReferenceUrl ?? AppStrings.unknownData,
-                                color: AppColors.kTextSecondary,
-                              ),
-                            ),
-                            SizedBox(width: 10),
+                            AppText(text: AppStrings.cloudUrl, fontWeight: FontWeight.w700),
+                            SizedBox(width: 20),
                             GestureDetector(
                               onTap: () {
                                 UtilFunctions.copyToClipBoard(

@@ -13,6 +13,7 @@ class AppStrings {
   static const comingSoon = "Coming Soon";
   static const compressingPhoto = "Compressing Photo";
   static const uploadingToCloud = "Uploading to cloud";
+  static const syncingWithCloud = "Syncing with cloud";
   static const photoSyncedSuccessfully = "Photo synced successfully!";
   static const syncFailed = "Sync failed.";
   static const failedToUploadToCloud = "Failed to upload to cloud";

@@ -9,7 +9,7 @@ import 'package:galleria/view/components/app_text.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 
-final cloudSyncViewModel = NotifierProvider<CloudSyncViewModel, PhotoSyncState>(
+final cloudSyncViewModel = NotifierProvider.autoDispose<CloudSyncViewModel, PhotoSyncState>(
   CloudSyncViewModel.new,
 );
 
@@ -168,8 +168,8 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
   /// Sync states includes; idle, compressing, uploading, success, error.
   String _syncStateTitle() {
     return switch (state) {
-      PhotoSyncState.compressing => AppStrings.compressingPhoto,
-      PhotoSyncState.uploading => AppStrings.uploadingToCloud,
+      PhotoSyncState.compressing => AppStrings.syncingWithCloud,
+      PhotoSyncState.uploading => AppStrings.syncingWithCloud,
       PhotoSyncState.success => AppStrings.photoSyncedSuccessfully,
       PhotoSyncState.error => AppStrings.syncFailed,
       _ => "",
