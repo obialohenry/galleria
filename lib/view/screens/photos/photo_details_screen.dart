@@ -50,15 +50,15 @@ class PhotoDetailsScreen extends ConsumerWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      !photosProvider[index].isSynced
-                          ? ref
-                                .read(cloudSyncViewModel.notifier)
-                                .syncPhoto(
-                                  context,
-                                  file: File(photosProvider[index].localPath),
-                                  photoId: photosProvider[index].id,
-                                )
-                          : debugPrint("THIS PHOTO IS ALREADY SYNCED");
+                      if (!photosProvider[index].isSynced) {
+                        ref
+                            .read(cloudSyncViewModel.notifier)
+                            .syncPhoto(
+                              context,
+                              file: File(photosProvider[index].localPath),
+                              photoId: photosProvider[index].id,
+                            );
+                      }
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -146,7 +146,7 @@ class PhotoDetailsScreen extends ConsumerWidget {
       ),
     );
   }
-  
+
   /// Changes the sync photo action buttons colour based on the sync process state.
   ///
   /// Sync states includes; idle, compressing, uploading, success, error.
