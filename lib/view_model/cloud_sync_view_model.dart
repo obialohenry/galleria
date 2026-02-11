@@ -61,9 +61,9 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
   ///parameter; file: The compressed file to be uploaded.
   ///
   ///This method creates a FirebaseStorage reference, and a reference to a specific file path within that storage.
-  ///It then uploads the specific file in the storage, while tracking the upload progress, after which it
+  ///It then uploads the specific file in the storage, after which it
   ///returns a downloadable URL for the stored file, and deletes the temporary stored compressed file on successful completion.
-  ///It catches and throws an Exception, if any.
+  ///It catches and throws an exceptions on Firebase.
   Future<String?> uploadPhotoToCloud(File file) async {
     String? downloadUrl;
     // Create a storage reference from our app
@@ -118,8 +118,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       if (!isDeviceConnectedToInternet) {
         _errorMessage = AppStrings.checkYourInternetConnection;
         state = PhotoSyncState.error;
-        debugPrint("Failed State: $state");
-        debugPrint("Failed State: $_errorMessage");
         return;
       }
 
@@ -152,10 +150,8 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
           .updateAPhoto(photoId: photoId, cloudReferenceId: downloadUrl);
       await PhotosLocalDb().updateAPhotoInLocalDb(updatedPhoto);
     } catch (e) {
-      state = PhotoSyncState.error;
       _errorMessage = e.toString();
-      debugPrint("Failed State: $state");
-      debugPrint("Failed State: $_errorMessage");
+      state = PhotoSyncState.error;
     }
   }
 
