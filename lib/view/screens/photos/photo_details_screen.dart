@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/src/config.dart';
 import 'package:galleria/src/view_model.dart';
+import 'package:galleria/utils/enums.dart';
 import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
 
@@ -12,6 +13,7 @@ class PhotoDetailsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final photosProvider = ref.watch(photosViewModel);
+    final syncState = ref.watch(cloudSyncViewModel);
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
@@ -50,7 +52,7 @@ class PhotoDetailsScreen extends ConsumerWidget {
                     onTap: () {
                       !photosProvider[index].isSynced
                           ? ref
-                                .watch(cloudSyncViewModel.notifier)
+                                .read(cloudSyncViewModel.notifier)
                                 .syncPhoto(
                                   context,
                                   file: File(photosProvider[index].localPath),
@@ -63,12 +65,12 @@ class PhotoDetailsScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         color: !photosProvider[index].isSynced
-                            ? ref.read(cloudSyncViewModel.notifier).syncButtonColor()
+                            ? _syncButtonColor(syncState)
                             : AppColors.kSuccess,
                       ),
                       child: AppText(
                         text: !photosProvider[index].isSynced
-                            ? ref.read(cloudSyncViewModel.notifier).syncButtonActionText()
+                            ? _syncButtonActionText(syncState)
                             : AppStrings.synced,
                         color: AppColors.kPrimaryPressed,
                         fontWeight: FontWeight.w700,
@@ -143,5 +145,27 @@ class PhotoDetailsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+  
+  /// Changes the sync photo action buttons colour based on the sync process state.
+  ///
+  /// Sync states includes; idle, compressing, uploading, success, error.
+  Color _syncButtonColor(PhotoSyncState state) {
+    return switch (state) {
+      PhotoSyncState.idle || PhotoSyncState.error => AppColors.kPrimary,
+      PhotoSyncState.compressing || PhotoSyncState.uploading => AppColors.kPending,
+      PhotoSyncState.success => AppColors.kSuccess,
+    };
+  }
+
+  /// Changes the sync photo action buttons text based on the sync process state.
+  ///
+  /// Sync states includes; idle, compressing, uploading, success, error.
+  String _syncButtonActionText(PhotoSyncState state) {
+    return switch (state) {
+      PhotoSyncState.idle || PhotoSyncState.error => AppStrings.syncPhoto,
+      PhotoSyncState.compressing || PhotoSyncState.uploading => AppStrings.syncing,
+      PhotoSyncState.success => AppStrings.synced,
+    };
   }
 }

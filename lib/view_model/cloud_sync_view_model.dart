@@ -168,28 +168,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     };
   }
 
-  /// Changes the sync photo action buttons colour based on the sync process state.
-  ///
-  /// Sync states includes; idle, compressing, uploading, success, error.
-  Color syncButtonColor() {
-    return switch (state) {
-      PhotoSyncState.idle || PhotoSyncState.error => AppColors.kPrimary,
-      PhotoSyncState.compressing || PhotoSyncState.uploading => AppColors.kPending,
-      PhotoSyncState.success => AppColors.kSuccess,
-    };
-  }
-
-  /// Changes the sync photo action buttons text based on the sync process state.
-  ///
-  /// Sync states includes; idle, compressing, uploading, success, error.
-  String syncButtonActionText() {
-    return switch (state) {
-      PhotoSyncState.idle || PhotoSyncState.error => AppStrings.syncPhoto,
-      PhotoSyncState.compressing || PhotoSyncState.uploading => AppStrings.syncing,
-      PhotoSyncState.success => AppStrings.synced,
-    };
-  }
-
   /// Returns the feedback dialog content for each sync process state.
   ///
   /// Sync states includes; idle, compressing, uploading, success, error.
