@@ -15,7 +15,7 @@ final cloudSyncViewModel = NotifierProvider.autoDispose<CloudSyncViewModel, Phot
 );
 
 class CloudSyncViewModel extends Notifier<PhotoSyncState> {
-  double _uploadProgress = 0.0;
+  // double _uploadProgress = 0.0;
   String _errorMessage = '';
   @override
   build() {
@@ -77,11 +77,11 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
 
       final uploadingPhoto = photosRef.putFile(file, metadata);
 
-      uploadingPhoto.snapshotEvents.listen((TaskSnapshot snapshot) {
-        // Calculate progress
-        _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
-        state = PhotoSyncState.uploading;
-      });
+      // uploadingPhoto.snapshotEvents.listen((TaskSnapshot snapshot) {
+      //   // Calculate progress
+      //   _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+      //   state = PhotoSyncState.uploading;
+      // });
       await uploadingPhoto;
       downloadUrl = await photosRef.getDownloadURL();
       await file.delete();
@@ -151,10 +151,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
           .read(photosViewModel.notifier)
           .updateAPhoto(photoId: photoId, cloudReferenceId: downloadUrl);
       await PhotosLocalDb().updateAPhotoInLocalDb(updatedPhoto);
-      //Pops off sync process dialog
-      if (context.mounted) {
-        Navigator.pop(context);
-      }
     } catch (e) {
       state = PhotoSyncState.error;
       _errorMessage = e.toString();
@@ -166,11 +162,11 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
   /// Returns the feedback dialog title for each sync process state.
   ///
   /// Sync states includes; idle, compressing, uploading, success, error.
-  String _syncStateTitle() {
-    return switch (state) {
+  String _syncStateTitle(PhotoSyncState syncState) {
+    return switch (syncState) {
       PhotoSyncState.idle => "",
-      PhotoSyncState.compressing => AppStrings.syncingWithCloud,
-      PhotoSyncState.uploading => AppStrings.syncingWithCloud,
+      PhotoSyncState.compressing => AppStrings.compressingPhoto,
+      PhotoSyncState.uploading => AppStrings.uploadingToCloud,
       PhotoSyncState.success => AppStrings.photoSyncedSuccessfully,
       PhotoSyncState.error => AppStrings.syncFailed,
     };
@@ -201,26 +197,54 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
   /// Returns the feedback dialog content for each sync process state.
   ///
   /// Sync states includes; idle, compressing, uploading, success, error.
-  Widget _syncProcessContent(BuildContext context) {
-    return switch (state) {
+  Widget _syncProcessContent(PhotoSyncState syncState, BuildContext context) {
+    return switch (syncState) {
       PhotoSyncState.idle => AppText(
         text: AppStrings.checkingInternetConnection,
         color: AppColors.kContentAlert,
         fontWeight: FontWeight.w400,
         fontSize: 16,
       ),
-      PhotoSyncState.compressing => Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.kBackgroundPrimary),
-        ),
+      PhotoSyncState.compressing => Column(
+        children: [
+          SizedBox(height: 50),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.kBackgroundPrimary),
+          ),
+        ],
       ),
-      PhotoSyncState.uploading => Center(
-        child: CircularProgressIndicator(
-          value: _uploadProgress,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.kBackgroundPrimary),
-        ),
+      PhotoSyncState.uploading => Column(
+        children: [
+          SizedBox(height: 50),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.kBackgroundPrimary),
+          ),
+        ],
       ),
-      PhotoSyncState.success => Image(image: AssetImage(AppImages.successIcon)),
+      PhotoSyncState.success => Column(
+        children: [
+          Image(image: AssetImage(AppImages.successIcon)),
+          SizedBox(height: 30),
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: AppColors.kSuccess,
+              ),
+              child: AppText(
+                text: AppStrings.okay,
+                color: AppColors.kPrimaryPressed,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
       PhotoSyncState.error => Column(
         children: [
           Image(image: AssetImage(AppImages.errorIcon)),
@@ -277,14 +301,30 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       builder: (context) {
         return Consumer(
           builder: (context, ref, _) {
-            return AlertDialog(
-              backgroundColor: AppColors.kSurfaceAlert,
-              title: AppText(
-                text: _syncStateTitle(),
-                color: AppColors.kContentAlert,
-                fontWeight: FontWeight.w600,
+            final syncState = ref.watch(cloudSyncViewModel);
+            return Center(
+              child: Dialog(
+                backgroundColor: AppColors.kSurfaceAlert,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: SizedBox(
+                  height: 250,
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      children: [
+                        AppText(
+                          text: _syncStateTitle(syncState),
+                          color: AppColors.kContentAlert,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        SizedBox(height: 20),
+                        _syncProcessContent(syncState, context),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              content: _syncProcessContent(context),
             );
           },
         );
@@ -292,3 +332,4 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     );
   }
 }
+
