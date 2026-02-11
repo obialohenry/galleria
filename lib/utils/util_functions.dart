@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:galleria/src/config.dart';
 import 'package:galleria/src/package.dart';
 import 'package:galleria/view/components/app_text.dart';
 import 'package:intl/intl.dart';
 
 class UtilFunctions {
+  static final Dio _dio = Dio();
+
   ///Create an album name on device, and save a file image's path to the created album in the device.
   static Future<bool> saveImageToDeviceGallery({
     required File file,
@@ -187,5 +190,32 @@ class UtilFunctions {
         duration: Duration(seconds: 2),
       ),
     );
+  }
+
+  static Future<bool> isDeviceConnectedToNetwork() async {
+    try {
+      final connectivityResults = await Connectivity().checkConnectivity();
+
+      if (connectivityResults.isEmpty ||
+          connectivityResults.every((result) => result == ConnectivityResult.none)) {
+        return false;
+      }
+
+      final response = await _dio.get(
+        'https://clients3.google.com/generate_204',
+        options: Options(
+          method: 'HEAD',
+          sendTimeout: Duration(seconds: 3),
+          receiveTimeout: Duration(seconds: 3),
+          validateStatus: (_) => true,
+        ),
+      );
+      if (response.statusCode == 204) {
+        return true;
+      }
+    } catch (_) {
+      return false;
+    }
+    return false;
   }
 }

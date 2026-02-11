@@ -51,6 +51,8 @@ dependencies:
   firebase_storage: ^13.0.6
   firebase_auth: ^6.1.4
   flutter_image_compress: ^2.4.0
+  connectivity_plus: ^7.0.0
+  dio: ^5.9.1
 
 dev_dependencies:
   flutter_test:

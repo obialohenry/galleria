@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:galleria/config/app_images.dart';
 import 'package:galleria/src/config.dart';
 import 'package:galleria/src/package.dart';
 import 'package:galleria/src/view_model.dart';
-import 'package:galleria/utils/alert.dart';
 import 'package:galleria/utils/enums.dart';
+import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
@@ -36,18 +37,18 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     debugPrint("Temp directory: ${tempDir.path}");
     final targetPath = "${tempDir.path}/photo_${DateTime.now().millisecondsSinceEpoch}.jpg";
     debugPrint("Target path: $targetPath");
-      final result = await FlutterImageCompress.compressAndGetFile(
-        file.absolute.path,
-        targetPath,
+    final result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
       minWidth: 1280,
       minHeight: 720,
-        quality: AppConstants.kCompressionQuality,
-      );
+      quality: AppConstants.kCompressionQuality,
+    );
     debugPrint("Compression result: ${result?.path ?? 'NULL'}");
-      if (result != null) {
+    if (result != null) {
       File compressedFile = File(result.path);
-        debugPrint("Original File: ${file.lengthSync()}");
-        debugPrint("Compressed File: ${compressedFile.lengthSync()}");
+      debugPrint("Original File: ${file.lengthSync()}");
+      debugPrint("Compressed File: ${compressedFile.lengthSync()}");
       return compressedFile;
     } else {
       debugPrint("Compression returned null");
@@ -85,13 +86,12 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       downloadUrl = await photosRef.getDownloadURL();
       await file.delete();
       return downloadUrl;
-      
     } on FirebaseException catch (e) {
       await file.delete();
       _errorMessage = _uploadExceptions(e.code);
       debugPrint("Firebase error: ${e.code} - ${e.message}");
       return null;
-    } 
+    }
   }
 
   ///Sync a photo file to the cloud.
@@ -112,17 +112,23 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     required String photoId,
   }) async {
     try {
+      syncProcessDialog(context);
+
+      final isDeviceConnectedToInternet = await UtilFunctions.isDeviceConnectedToNetwork();
+      if (!isDeviceConnectedToInternet) {
+        _errorMessage = AppStrings.checkYourInternetConnection;
+        state = PhotoSyncState.error;
+        debugPrint("Failed State: $state");
+        debugPrint("Failed State: $_errorMessage");
+        return;
+      }
+
       //Compressing photo.
       state = PhotoSyncState.compressing;
-
-      syncProcessDialog(context, title: _syncStateTitle(), content: _syncProcessContent());
-
       final compressedPhoto = await compressPhoto(file);
       if (compressedPhoto == null) {
         _errorMessage = AppStrings.failedToCompressPhoto;
         state = PhotoSyncState.error;
-        //Pops off sync process dialog
-        if (context.mounted) Navigator.pop(context);
         return;
       }
 
@@ -130,15 +136,14 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       state = PhotoSyncState.uploading;
       final downloadUrl = await uploadPhotoToCloud(compressedPhoto);
       debugPrint("DOWNLOAD URL: $downloadUrl");
-
       if (downloadUrl == null) {
         if (_errorMessage.isEmpty) {
           _errorMessage = AppStrings.failedToUploadToCloud;
         }
         state = PhotoSyncState.error;
-        if (context.mounted) Navigator.pop(context);
         return;
       }
+
       //Success
       state = PhotoSyncState.success;
       debugPrint("PHOTO SYNCED SUCCESSFULLY");
@@ -146,7 +151,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
           .read(photosViewModel.notifier)
           .updateAPhoto(photoId: photoId, cloudReferenceId: downloadUrl);
       await PhotosLocalDb().updateAPhotoInLocalDb(updatedPhoto);
-
       //Pops off sync process dialog
       if (context.mounted) {
         Navigator.pop(context);
@@ -154,12 +158,8 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     } catch (e) {
       state = PhotoSyncState.error;
       _errorMessage = e.toString();
-      debugPrint(e.toString());
-
-      //Pops off sync process dialog
-      if (context.mounted) {
-        Navigator.pop(context);
-      }
+      debugPrint("Failed State: $state");
+      debugPrint("Failed State: $_errorMessage");
     }
   }
 
@@ -168,11 +168,11 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
   /// Sync states includes; idle, compressing, uploading, success, error.
   String _syncStateTitle() {
     return switch (state) {
+      PhotoSyncState.idle => "",
       PhotoSyncState.compressing => AppStrings.syncingWithCloud,
       PhotoSyncState.uploading => AppStrings.syncingWithCloud,
       PhotoSyncState.success => AppStrings.photoSyncedSuccessfully,
       PhotoSyncState.error => AppStrings.syncFailed,
-      _ => "",
     };
   }
 
@@ -201,9 +201,14 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
   /// Returns the feedback dialog content for each sync process state.
   ///
   /// Sync states includes; idle, compressing, uploading, success, error.
-  Widget _syncProcessContent() {
+  Widget _syncProcessContent(BuildContext context) {
     return switch (state) {
-      PhotoSyncState.idle => const SizedBox.shrink(),
+      PhotoSyncState.idle => AppText(
+        text: AppStrings.checkingInternetConnection,
+        color: AppColors.kContentAlert,
+        fontWeight: FontWeight.w400,
+        fontSize: 16,
+      ),
       PhotoSyncState.compressing => Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.kBackgroundPrimary),
@@ -226,6 +231,28 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
             fontWeight: FontWeight.w400,
             fontSize: 16,
           ),
+          SizedBox(height: 25),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.kSuccess,
+                ),
+                child: AppText(
+                  text: AppStrings.okay,
+                  color: AppColors.kPrimaryPressed,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     };
@@ -241,5 +268,27 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       'storage/retry-limit-exceeded' => "Too many retries, likely network issue",
       _ => "An error occurred on Firebase $error",
     };
+  }
+
+  void syncProcessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, _) {
+            return AlertDialog(
+              backgroundColor: AppColors.kSurfaceAlert,
+              title: AppText(
+                text: _syncStateTitle(),
+                color: AppColors.kContentAlert,
+                fontWeight: FontWeight.w600,
+              ),
+              content: _syncProcessContent(context),
+            );
+          },
+        );
+      },
+    );
   }
 }
