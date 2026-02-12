@@ -79,7 +79,6 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
   Future<File?> takePicture() async {
     await sound();
     final cameraState = state.value!;
-    // try {
     File? imageFile;
     if (!cameraState.controller.value.isTakingPicture) {
       final XFile xFile = await cameraState.controller.takePicture();
@@ -91,11 +90,6 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
     } else {
       print("ALREADY IN THE PROCESS OF TAKING A PHOTO");
     }
-    // } on CameraException {
-    //   print("ALREADY IN THE PROCESS OF TAKING A PHOTO");
-    // } catch (e, s) {
-    //   print("Error $e occured at $s");
-    // }
 
     return imageFile;
   }

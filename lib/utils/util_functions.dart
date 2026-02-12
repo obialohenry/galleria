@@ -155,17 +155,14 @@ class UtilFunctions {
     if (currentUser != null) {
       // User already signed in, use existing account
       DummyData.userId = currentUser.uid;
-      debugPrint("Current user ID: ${DummyData.userId}");
     } else {
       // No user signed in, create anonymous account
       try {
         final userCredential = await FirebaseAuth.instance.signInAnonymously();
-        print("Signed in with temporary account.");
 
         final user = userCredential.user;
         if (user != null) {
           DummyData.userId = user.uid;
-          debugPrint("User ID: ${DummyData.userId}");
         }
       } on FirebaseAuthException catch (e) {
         switch (e.code) {

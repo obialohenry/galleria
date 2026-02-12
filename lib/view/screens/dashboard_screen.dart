@@ -22,8 +22,8 @@ class DashboardScreen extends ConsumerWidget {
         unselectedItemColor: AppColors.kTextSecondary,
         onTap: (value) => ref.read(dashboardViewModel.notifier).changeScreen(value),
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.photo_camera), label: "Take a Photo"),
-          BottomNavigationBarItem(icon: Icon(Icons.photo_album), label: "Photos"),
+          BottomNavigationBarItem(icon: Icon(Icons.photo_camera), label: AppStrings.takeAPhoto),
+          BottomNavigationBarItem(icon: Icon(Icons.photo_album), label: AppStrings.photos),
         ],
       ),
     );

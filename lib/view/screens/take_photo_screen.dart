@@ -84,9 +84,6 @@ class TakePhotoScreen extends ConsumerWidget {
                             latitude: position.latitude,
                             longitude: position.longitude,
                           );
-                          print(
-                            "date:$date\ntime:$time\nlat:${position.latitude}\nlong:${position.longitude}\naddress:$address\nimage:${image.path}",
-                          );
                           ref
                               .read(photosViewModel.notifier)
                               .updatePhotosList(

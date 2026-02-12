@@ -9,7 +9,6 @@ class PhotosLocalDb {
   Future<bool> savePhoto(PhotoModel photo) async {
     try {
       await _box.put(photo.localPath, photo);
-      print("Successfully saved photo to hive.");
     } catch (e, s) {
       print("An error occured: $e at\n$s");
       return false;
@@ -20,7 +19,6 @@ class PhotosLocalDb {
   ///Return all photo objects stored in the db.
   List<PhotoModel> getAllPhotos() {
     try {
-      print("photos: ${_box.values.toList()}");
       return _box.values.toList();
     } catch (e, s) {
       print("An error occured: $e at\n$s");
@@ -31,7 +29,6 @@ class PhotosLocalDb {
   ///Return a List of the keys' unique to stored photo models in the app.
   List<dynamic> getAllPhotoKeys() {
     try {
-      print("photos Keys: ${_box.keys.toList()}");
       return _box.keys.toList();
     } catch (e, s) {
       print("An error occured: $e at\n$s");
@@ -48,6 +45,5 @@ class PhotosLocalDb {
   //Updates the metadata of photo stored in the local Database.
   Future<void> updateAPhotoInLocalDb(PhotoModel photo) async {
     await _box.put(photo.localPath, photo);
-    print("Successfully updated photo in hive.");
   }
 }

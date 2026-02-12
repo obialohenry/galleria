@@ -15,7 +15,6 @@ final cloudSyncViewModel = NotifierProvider.autoDispose<CloudSyncViewModel, Phot
 );
 
 class CloudSyncViewModel extends Notifier<PhotoSyncState> {
-  // double _uploadProgress = 0.0;
   String _errorMessage = '';
   @override
   build() {
@@ -30,13 +29,9 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
   ///in a timestamp-based naming format.
   ///It then return the compressed file when successful, or a null value when the process fails.
   Future<File?> compressPhoto(File file) async {
-    debugPrint("COMPRESSING: ${file.path}");
-    debugPrint("File exists: ${file.existsSync()}");
 
     final tempDir = await getTemporaryDirectory();
-    debugPrint("Temp directory: ${tempDir.path}");
     final targetPath = "${tempDir.path}/photo_${DateTime.now().millisecondsSinceEpoch}.jpg";
-    debugPrint("Target path: $targetPath");
     final result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
       targetPath,
@@ -44,11 +39,8 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       minHeight: 720,
       quality: AppConstants.kCompressionQuality,
     );
-    debugPrint("Compression result: ${result?.path ?? 'NULL'}");
     if (result != null) {
       File compressedFile = File(result.path);
-      debugPrint("Original File: ${file.lengthSync()}");
-      debugPrint("Compressed File: ${compressedFile.lengthSync()}");
       return compressedFile;
     } else {
       debugPrint("Compression returned null");
@@ -76,12 +68,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       final metadata = SettableMetadata(contentType: 'image/jpeg');
 
       final uploadingPhoto = photosRef.putFile(file, metadata);
-
-      // uploadingPhoto.snapshotEvents.listen((TaskSnapshot snapshot) {
-      //   // Calculate progress
-      //   _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
-      //   state = PhotoSyncState.uploading;
-      // });
       await uploadingPhoto;
       downloadUrl = await photosRef.getDownloadURL();
       await file.delete();
@@ -89,7 +75,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
     } on FirebaseException catch (e) {
       await file.delete();
       _errorMessage = _uploadExceptions(e.code);
-      debugPrint("Firebase error: ${e.code} - ${e.message}");
       return null;
     }
   }
@@ -133,7 +118,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       //Uploading photo to cloud.
       state = PhotoSyncState.uploading;
       final downloadUrl = await uploadPhotoToCloud(compressedPhoto);
-      debugPrint("DOWNLOAD URL: $downloadUrl");
       if (downloadUrl == null) {
         if (_errorMessage.isEmpty) {
           _errorMessage = AppStrings.failedToUploadToCloud;
@@ -144,7 +128,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
 
       //Success
       state = PhotoSyncState.success;
-      debugPrint("PHOTO SYNCED SUCCESSFULLY");
       final updatedPhoto = ref
           .read(photosViewModel.notifier)
           .updateAPhoto(photoId: photoId, cloudReferenceId: downloadUrl);
