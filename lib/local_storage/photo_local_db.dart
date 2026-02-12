@@ -8,7 +8,7 @@ class PhotosLocalDb {
   ///Save a photo object (PhotoModel) to the db.
   Future<bool> savePhoto(PhotoModel photo) async {
     try {
-      await _box.put(photo.localPath, photo);
+      await _box.put(photo.id, photo);
     } catch (e, s) {
       print("An error occured: $e at\n$s");
       return false;
@@ -17,9 +17,15 @@ class PhotosLocalDb {
   }
 
   ///Return all photo objects stored in the db.
+  ///
+  ///Sort photos based on when they where created, and return the sorted list.
   List<PhotoModel> getAllPhotos() {
     try {
-      return _box.values.toList();
+      final photos = _box.values.toList();
+      photos.sort(
+        (firstElement, secondElement) => firstElement.createdAt.compareTo(secondElement.createdAt),
+      );
+      return photos;
     } catch (e, s) {
       print("An error occured: $e at\n$s");
       return [];
@@ -36,6 +42,15 @@ class PhotosLocalDb {
     }
   }
 
+  PhotoModel? getAPhotoObject(String key) {
+    try {
+      return _box.get(key);
+    } catch (e, s) {
+      print("An error occured: $e at\n$s");
+      return null;
+    }
+  }
+
   ///Deletes a list of photos using there keys.
   ///parameter; keys: List of keys/photo objects to be deleted.
   Future<void> deletePhotos(List<dynamic> keys) async {
@@ -44,6 +59,6 @@ class PhotosLocalDb {
 
   //Updates the metadata of photo stored in the local Database.
   Future<void> updateAPhotoInLocalDb(PhotoModel photo) async {
-    await _box.put(photo.localPath, photo);
+    await _box.put(photo.id, photo);
   }
 }

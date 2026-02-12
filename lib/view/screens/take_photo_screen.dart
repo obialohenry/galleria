@@ -93,6 +93,7 @@ class TakePhotoScreen extends ConsumerWidget {
                                   time: time,
                                   localPath: image.path,
                                   location: address,
+                                  createdAt: DateTime.now()
                                 ),
                               );
                         }

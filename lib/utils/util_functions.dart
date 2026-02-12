@@ -140,9 +140,10 @@ class UtilFunctions {
   static void updateHiveDbBasedOnPhotosInGallery(List<String> imagePaths) {
     final photoKeys = PhotosLocalDb().getAllPhotoKeys();
 
-    final keysToDelete = photoKeys
-        .where((key) => !imagePaths.contains(key.split('/').last))
-        .toList();
+    final keysToDelete = photoKeys.where((key) {
+      final photo = PhotosLocalDb().getAPhotoObject(key);
+      return photo != null && !imagePaths.contains(photo.localPath.split('/').last);
+    }).toList();
     PhotosLocalDb().deletePhotos(keysToDelete);
   }
 

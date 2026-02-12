@@ -25,12 +25,16 @@ class PhotoModel extends HiveObject {
   @HiveField(6)
   String? cloudId;
 
+  @HiveField(7)
+  DateTime createdAt;
+
   PhotoModel({
     required this.id,
     required this.date,
     required this.time,
     required this.localPath,
     required this.location,
+    required this.createdAt,
     this.isSynced = false,
     this.cloudId,
   });
@@ -42,6 +46,7 @@ class PhotoModel extends HiveObject {
       time: time,
       localPath: localPath,
       location: location,
+      createdAt: createdAt,
       isSynced: isSynced ?? this.isSynced,
       cloudId: cloudId ?? this.cloudId,
     );
