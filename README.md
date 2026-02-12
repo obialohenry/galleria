@@ -98,9 +98,11 @@ Because development was done on Windows, the iOS-specific Podfile setup could no
 
 ### Sprint 2 – Cloud Synchronization
 This sprint focused on syncing a single image file with the cloud using Firebase (Firebase storage).
-
-#### Known Issues & Observations (Sprint 2)
-The following bahaviors were observed during testing and are documented for transparency:
+#### Feature Implemented
+- "Sync this photo" action button in the photo details screen
+  - Compresses an image file to 1280x720.
+  - Uploads the compressed file to Firebase storage and return a cloud reference URL.
+  - Display feedback to a user, throught the entire process, on the screen.
 
 #### Platform-Specific Notes
 
@@ -143,6 +145,10 @@ Because development was done on Windows, the iOS-specific Podfile setup could no
  - Anonymous authentication: firebase_auth
 
  - Compress image file's: flutter_image_compress
+
+ - Checks if device has network access: connectivity_plus
+
+ - Checks if device has internet connection: dio
   
 ## Next Planned Sprints
 

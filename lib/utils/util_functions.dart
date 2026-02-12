@@ -192,6 +192,16 @@ class UtilFunctions {
     );
   }
 
+  ///Checks If a device has internet connectivity
+  ///
+  ///It first checks if a device has access to a network (wifi, mobile data, e.t.c.),
+  ///if not, the function returns false (no network connection).
+  ///It then checks if the device has internet connectivity by making a simple netwrok
+  ///request to `https://clients3.google.com/generate_204`, GOOGLE maintains this URL specifically to check
+  ///internet connectivity. If the response status code returns `204`, then it's successful, and the device has internet connectivity, returning true.
+  ///If the response status code returns any other value, or an exception occurs, then it failed, and the device has no internet connectivity, thus returning false.
+  ///
+  ///It makes the network request for a duration of 3 seconds.
   static Future<bool> isDeviceConnectedToNetwork() async {
     try {
       final connectivityResults = await Connectivity().checkConnectivity();
