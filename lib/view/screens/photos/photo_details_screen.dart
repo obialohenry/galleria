@@ -2,9 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:galleria/src/config.dart';
+import 'package:galleria/src/utils.dart';
 import 'package:galleria/src/view_model.dart';
-import 'package:galleria/utils/enums.dart';
-import 'package:galleria/utils/util_functions.dart';
 import 'package:galleria/view/components/app_text.dart';
 
 class PhotoDetailsScreen extends ConsumerWidget {
@@ -51,10 +50,10 @@ class PhotoDetailsScreen extends ConsumerWidget {
                   GestureDetector(
                     onTap: () {
                       if (!photosProvider[index].isSynced) {
+                        syncProcessDialog(context);
                         ref
                             .read(cloudSyncViewModel.notifier)
                             .syncPhoto(
-                              context,
                               file: File(photosProvider[index].localPath),
                               photoId: photosProvider[index].id,
                             );
@@ -65,12 +64,12 @@ class PhotoDetailsScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         color: !photosProvider[index].isSynced
-                            ? _syncButtonColor(syncState)
+                            ? _syncButtonColor(syncState.status)
                             : AppColors.kSuccess,
                       ),
                       child: AppText(
                         text: !photosProvider[index].isSynced
-                            ? _syncButtonActionText(syncState)
+                            ? _syncButtonActionText(syncState.status)
                             : AppStrings.synced,
                         color: AppColors.kPrimaryPressed,
                         fontWeight: FontWeight.w700,
@@ -150,22 +149,22 @@ class PhotoDetailsScreen extends ConsumerWidget {
   /// Changes the sync photo action buttons colour based on the sync process state.
   ///
   /// Sync states includes; idle, compressing, uploading, success, error.
-  Color _syncButtonColor(PhotoSyncState state) {
+  Color _syncButtonColor(PhotoSyncStatus state) {
     return switch (state) {
-      PhotoSyncState.idle || PhotoSyncState.error => AppColors.kPrimary,
-      PhotoSyncState.compressing || PhotoSyncState.uploading => AppColors.kPending,
-      PhotoSyncState.success => AppColors.kSuccess,
+      PhotoSyncStatus.idle || PhotoSyncStatus.error => AppColors.kPrimary,
+      PhotoSyncStatus.compressing || PhotoSyncStatus.uploading => AppColors.kPending,
+      PhotoSyncStatus.success => AppColors.kSuccess,
     };
   }
 
   /// Changes the sync photo action buttons text based on the sync process state.
   ///
   /// Sync states includes; idle, compressing, uploading, success, error.
-  String _syncButtonActionText(PhotoSyncState state) {
+  String _syncButtonActionText(PhotoSyncStatus state) {
     return switch (state) {
-      PhotoSyncState.idle || PhotoSyncState.error => AppStrings.syncPhoto,
-      PhotoSyncState.compressing || PhotoSyncState.uploading => AppStrings.syncing,
-      PhotoSyncState.success => AppStrings.synced,
+      PhotoSyncStatus.idle || PhotoSyncStatus.error => AppStrings.syncPhoto,
+      PhotoSyncStatus.compressing || PhotoSyncStatus.uploading => AppStrings.syncing,
+      PhotoSyncStatus.success => AppStrings.synced,
     };
   }
 }

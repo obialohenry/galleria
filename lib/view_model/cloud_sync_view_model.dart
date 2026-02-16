@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:galleria/config/app_images.dart';
+import 'package:galleria/model/local/photo_sync_state.dart';
 import 'package:galleria/src/config.dart';
 import 'package:galleria/src/package.dart';
 import 'package:galleria/src/view_model.dart';
 import 'package:galleria/utils/enums.dart';
 import 'package:galleria/utils/util_functions.dart';
-import 'package:galleria/view/components/app_text.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 
@@ -15,10 +14,10 @@ final cloudSyncViewModel = NotifierProvider.autoDispose<CloudSyncViewModel, Phot
 );
 
 class CloudSyncViewModel extends Notifier<PhotoSyncState> {
-  String _errorMessage = '';
+  String? _errorMessage;
   @override
   build() {
-    return PhotoSyncState.idle;
+    return PhotoSyncState();
   }
 
   ///Compresses a photo file.
@@ -91,152 +90,53 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
   ///Each process handles failure state by displaying an error message and stoping the entire sync process.
   ///When successfull, a cloud reference URL for the photo file will be displayed on screen, and the photo object metadata
   ///will be updated at both runtime and on the device local storage.
-  Future<void> syncPhoto(
-    BuildContext context, {
+  Future<void> syncPhoto({
     required File file,
     required String photoId,
   }) async {
     try {
-      syncProcessDialog(context);
 
       final isDeviceConnectedToInternet = await UtilFunctions.isDeviceConnectedToNetwork();
       if (!isDeviceConnectedToInternet) {
-        _errorMessage = AppStrings.checkYourInternetConnection;
-        state = PhotoSyncState.error;
+        state = state.withChanges(
+          status: PhotoSyncStatus.error,
+          errorMessage: AppStrings.checkYourInternetConnection,
+        );
         return;
       }
 
       //Compressing photo.
-      state = PhotoSyncState.compressing;
+      state = state.withChanges(status: PhotoSyncStatus.compressing);
       final compressedPhoto = await compressPhoto(file);
       if (compressedPhoto == null) {
-        _errorMessage = AppStrings.failedToCompressPhoto;
-        state = PhotoSyncState.error;
+        state = state.withChanges(
+          status: PhotoSyncStatus.error,
+          errorMessage: AppStrings.failedToCompressPhoto,
+        );
         return;
       }
 
       //Uploading photo to cloud.
-      state = PhotoSyncState.uploading;
+      state = state.withChanges(status: PhotoSyncStatus.uploading);
       final downloadUrl = await uploadPhotoToCloud(compressedPhoto);
       if (downloadUrl == null) {
-        if (_errorMessage.isEmpty) {
-          _errorMessage = AppStrings.failedToUploadToCloud;
-        }
-        state = PhotoSyncState.error;
+        state = state.withChanges(
+          status: PhotoSyncStatus.error,
+          errorMessage: _errorMessage ?? AppStrings.failedToUploadToCloud,
+        );
         return;
       }
 
       //Success
-      state = PhotoSyncState.success;
+      state = state.withChanges(status: PhotoSyncStatus.success);
       final updatedPhoto = ref
           .read(photosViewModel.notifier)
           .updateAPhoto(photoId: photoId, cloudReferenceId: downloadUrl);
       await PhotosLocalDb().updateAPhotoInLocalDb(updatedPhoto);
     } catch (e) {
       _errorMessage = e.toString();
-      state = PhotoSyncState.error;
+      state = state.withChanges(status: PhotoSyncStatus.error, errorMessage: _errorMessage);
     }
-  }
-
-  /// Returns the feedback dialog title for each sync process state.
-  ///
-  /// Sync states includes; idle, compressing, uploading, success, error.
-  String _syncStateTitle(PhotoSyncState syncState) {
-    return switch (syncState) {
-      PhotoSyncState.idle => "",
-      PhotoSyncState.compressing => AppStrings.compressingPhoto,
-      PhotoSyncState.uploading => AppStrings.uploadingToCloud,
-      PhotoSyncState.success => AppStrings.photoSyncedSuccessfully,
-      PhotoSyncState.error => AppStrings.syncFailed,
-    };
-  }
-
-  /// Returns the feedback dialog content for each sync process state.
-  ///
-  /// Sync states includes; idle, compressing, uploading, success, error.
-  Widget _syncProcessContent(PhotoSyncState syncState, BuildContext context) {
-    return switch (syncState) {
-      PhotoSyncState.idle => AppText(
-        text: AppStrings.checkingInternetConnection,
-        color: AppColors.kContentAlert,
-        fontWeight: FontWeight.w400,
-        fontSize: 16,
-      ),
-      PhotoSyncState.compressing => Column(
-        children: [
-          SizedBox(height: 50),
-          CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.kBackgroundPrimary),
-          ),
-        ],
-      ),
-      PhotoSyncState.uploading => Column(
-        children: [
-          SizedBox(height: 50),
-          CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.kBackgroundPrimary),
-          ),
-        ],
-      ),
-      PhotoSyncState.success => Column(
-        children: [
-          Image(image: AssetImage(AppImages.successIcon)),
-          SizedBox(height: 30),
-          GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: AppColors.kSuccess,
-              ),
-              child: AppText(
-                text: AppStrings.okay,
-                color: AppColors.kPrimaryPressed,
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-      PhotoSyncState.error => Column(
-        children: [
-          Image(image: AssetImage(AppImages.errorIcon)),
-          SizedBox(height: 10),
-          AppText(
-            text: _errorMessage,
-            color: AppColors.kContentAlert,
-            fontWeight: FontWeight.w400,
-            fontSize: 16,
-          ),
-          SizedBox(height: 25),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: AppColors.kSuccess,
-                ),
-                child: AppText(
-                  text: AppStrings.okay,
-                  color: AppColors.kPrimaryPressed,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    };
   }
 
   String _uploadExceptions(String error) {
@@ -249,44 +149,6 @@ class CloudSyncViewModel extends Notifier<PhotoSyncState> {
       'storage/retry-limit-exceeded' => "Too many retries, likely network issue",
       _ => "An error occurred on Firebase $error",
     };
-  }
-
-  void syncProcessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Consumer(
-          builder: (context, ref, _) {
-            final syncState = ref.watch(cloudSyncViewModel);
-            return Center(
-              child: Dialog(
-                backgroundColor: AppColors.kSurfaceAlert,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: SizedBox(
-                  height: 250,
-                  width: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Column(
-                      children: [
-                        AppText(
-                          text: _syncStateTitle(syncState),
-                          color: AppColors.kContentAlert,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        SizedBox(height: 20),
-                        _syncProcessContent(syncState, context),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 }
 

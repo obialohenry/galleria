@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:galleria/src/config.dart';
 import 'package:galleria/view/components/app_text.dart';
+import 'package:galleria/view/components/sync_process_dialog_widget.dart';
 
 void comingSoonDialog(BuildContext context) {
   showDialog(
@@ -27,5 +28,12 @@ void comingSoonDialog(BuildContext context) {
       );
     },
   );
+}
 
+void syncProcessDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => SyncProcessDialogWidget(),
+  );
 }
