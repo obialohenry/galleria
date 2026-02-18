@@ -1,6 +1,5 @@
 export 'package:firebase_auth/firebase_auth.dart';
 export 'package:flutter/material.dart';
-export 'package:galleria/config/app_strings.dart';
 export 'package:galleria/local_storage/photo_local_db.dart';
 export 'package:galleria/model/local/dummy_data.dart';
 export 'package:gallery_saver_plus/gallery_saver.dart';

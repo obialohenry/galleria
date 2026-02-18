@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:camera/camera.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:galleria/config/app_strings.dart';
 import 'package:galleria/model/local/camera_state.dart';
+import 'package:galleria/src/package.dart';
 import 'package:galleria/utils/util_functions.dart';
 
 final availableCamerasProvider =
@@ -25,17 +23,15 @@ final cameraControllerProvider = AsyncNotifierProvider<CameraControllerProvider,
 
 class CameraControllerProvider extends AsyncNotifier<CameraState> {
   CameraController? _controller;
-  final _player = AudioPlayer();
 
   @override
   FutureOr<CameraState> build() async {
     final cameras = await ref.watch(availableCamerasProvider.future);
     ref.onDispose(() {
       _controller?.dispose();
-      _player.dispose();
     });
 
-    return _initializeCamera(cameras: cameras, cameraIndex: 0);
+    return await _initializeCamera(cameras: cameras, cameraIndex: 0);
   }
 
   ///Returns a new instance of camera state.
@@ -72,25 +68,36 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
 
   ///Play camera capture sound.
   Future<void> sound() async {
-    await _player.play(AssetSource("audio/camera_sound.mp3"));
+    final player = AudioPlayer();
+    try {
+      await player.play(AssetSource("audio/camera_sound.mp3"));
+    } finally {
+      player.dispose();
+    }
   }
 
   ///Take a photo and save it to the Galleria album on the device.
   Future<File?> takePicture() async {
-    await sound();
-    final cameraState = state.value!;
-    File? imageFile;
-    if (!cameraState.controller.value.isTakingPicture) {
-      final XFile xFile = await cameraState.controller.takePicture();
-      imageFile = File(xFile.path);
-      final success = await UtilFunctions.saveImageToDeviceGallery(file: imageFile);
-      if (!success) {
-        throw Exception(AppStrings.failedToSaveImage);
-      }
-    } else {
-      print("ALREADY IN THE PROCESS OF TAKING A PHOTO");
+    if (!state.hasValue || _controller == null) {
+      return null;
     }
 
-    return imageFile;
+    try {
+      await sound();
+    } catch (e, s) {
+      debugPrint("Sound Failed: $e \n at $s");
+    }
+
+    final cameraState = state.value!;
+    if (!cameraState.controller.value.isTakingPicture) {
+      final XFile xFile = await cameraState.controller.takePicture();
+      final imageFile = File(xFile.path);
+      final success = await UtilFunctions.saveImageToDeviceGallery(file: imageFile);
+      if (!success) {
+        return null;
+      }
+      return imageFile;
+    }
+    return null;
   }
 }
