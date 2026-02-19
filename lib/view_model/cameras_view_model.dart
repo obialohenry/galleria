@@ -23,12 +23,13 @@ final cameraControllerProvider = AsyncNotifierProvider<CameraControllerProvider,
 
 class CameraControllerProvider extends AsyncNotifier<CameraState> {
   CameraController? _controller;
-
+  AudioPlayer? _player;
   @override
   FutureOr<CameraState> build() async {
     final cameras = await ref.watch(availableCamerasProvider.future);
     ref.onDispose(() {
       _controller?.dispose();
+      _player?.dispose();
     });
 
     return await _initializeCamera(cameras: cameras, cameraIndex: 0);
@@ -68,11 +69,11 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
 
   ///Play camera capture sound.
   Future<void> sound() async {
-    final player = AudioPlayer();
+    _player = AudioPlayer();
     try {
-      await player.play(AssetSource("audio/camera_sound.mp3"));
-    } finally {
-      player.dispose();
+      await _player?.play(AssetSource("audio/camera_sound.mp3"));
+    } catch (e, s) {
+      debugPrint("Sound Failed: $e \n at $s");
     }
   }
 
@@ -80,12 +81,6 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
   Future<File?> takePicture() async {
     if (!state.hasValue || _controller == null) {
       return null;
-    }
-
-    try {
-      await sound();
-    } catch (e, s) {
-      debugPrint("Sound Failed: $e \n at $s");
     }
 
     final cameraState = state.value!;
@@ -96,6 +91,7 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
       if (!success) {
         return null;
       }
+      await sound();
       return imageFile;
     }
     return null;
