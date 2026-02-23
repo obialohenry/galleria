@@ -53,6 +53,7 @@ dependencies:
   flutter_image_compress: ^2.4.0
   connectivity_plus: ^7.0.0
   dio: ^5.9.1
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:

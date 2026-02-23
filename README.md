@@ -136,15 +136,17 @@ Because development was done on Windows, the iOS-specific Podfile setup could no
 
  - Required for all Firebase services: firebase_core
 
- - Uploading and managing files in Firebase Cloud Storage: firebase_storage
+ - Uploading and managing files in Firebase Cloud   Storage: firebase_storage
 
  - Anonymous authentication: firebase_auth
 
  - Compress image file's: flutter_image_compress
 
- - Checks if device has network access: connectivity_plus
+ - Checks if device has network access:            connectivity_plus
 
  - Checks if device has internet connection: dio
+
+ - Request for camera permissions: permission_handler
   
 ## Next Planned Sprints
 
