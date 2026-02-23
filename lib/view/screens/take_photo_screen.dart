@@ -18,9 +18,8 @@ class TakePhotoScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
-        child: Column(
-          children: [
-            if (cameraState.isLoading)
+        child: cameraState.isLoading
+            ?
               Expanded(
                 flex: 3,
                 child: Container(
@@ -28,30 +27,12 @@ class TakePhotoScreen extends ConsumerWidget {
                   child: Center(child: CircularProgressIndicator(color: AppColors.kPrimary)),
                 ),
               )
-            else if (uiState is CameraReady)
-              CameraPreview(uiState.controller)
-            else if (uiState is CameraPermissionDenied)
+            : (uiState is CameraReady)
+            ?
               Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.no_photography, color: AppColors.kInactiveColor, size: 20),
-                  SizedBox(height: 15),
-                  AppText(
-                    text: AppStrings.cameraPermissionRequiredToTakePhotos,
-                    color: AppColors.kTextSecondary,
-                  ),
-                ],
-              )
-            else if (uiState is CameraFailure)
-              Expanded(
-                flex: 2,
-                child: Container(
-                  color: AppColors.kPrimary,
-                  child: Center(child: AppText(text: uiState.message)),
-                ),
-              ),
-            Spacer(flex: 1),
-            if (cameraState.hasValue && uiState is CameraReady)
+                  CameraPreview(uiState.controller),
+                  Spacer(flex: 1),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
               child: Row(
@@ -142,11 +123,34 @@ class TakePhotoScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-            ),
-            // else if (cameraState.hasValue && uiState is CameraPermissionDenied)
-          ],
-        ),
-      ),
+                  ),
+                ],
+              )
+            : (uiState is CameraPermissionDenied)
+            ? Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.no_photography, color: AppColors.kInactiveColor, size: 100),
+                    SizedBox(height: 15),
+                    AppText(
+                      text: AppStrings.cameraPermissionRequiredToTakePhotos,
+                      color: AppColors.kTextSecondary,
+                    ),
+                  ],
+                ),
+              )
+            : (uiState is CameraFailure)
+            ? Expanded(
+                flex: 2,
+                child: Container(
+                  color: AppColors.kPrimary,
+                  child: Center(child: AppText(text: uiState.message)),
+                ),
+              )
+            : SizedBox.shrink(),
+      )
     );
   }
 }
