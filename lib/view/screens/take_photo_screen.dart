@@ -71,11 +71,7 @@ class TakePhotoScreen extends ConsumerWidget {
                         if (image != null) {
                           final date = UtilFunctions.formatDate(DateTime.now());
                           final time = UtilFunctions.formatTime(DateTime.now());
-                          Position position = await UtilFunctions.determinePosition();
-                          final address = await UtilFunctions.determineAddress(
-                            latitude: position.latitude,
-                            longitude: position.longitude,
-                          );
+                                final address = await UtilFunctions.determineAddress();
                           ref
                               .read(photosViewModel.notifier)
                               .updatePhotosList(

@@ -30,8 +30,7 @@ class UtilFunctions {
 
   /// Determines the current position of the device.
   ///
-  /// Throws a [LocationServiceDisabledException] or [PermissionDeniedException]
-  /// when location services are unavailable or permissions are not granted.
+  /// Throws an exception when location services are unavailable or permissions are not granted.
   static Future<Position> determinePosition() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -58,20 +57,18 @@ class UtilFunctions {
 
   /// Determines an address using a device position.
   ///
-  /// Parameters:
-  /// - latitude
-  /// - longitude
-  ///
-  /// Get's a list of placemarks of that latitude and longitude,
+  /// Get's a list of placemarks of a particular latitude and longitude gotten from the `determinePosition` method,
   /// If the list is not empty store the first placemark item. return an "Uknown location" string if empty.
   /// From the stored placemark item, we get non-nullable string parts that make up an acceptable address,
   /// and if empty or reverse geocoding fails returns a the "Unknown location" placeholder.
-  static Future<String> determineAddress({
-    required double latitude,
-    required double longitude,
-  }) async {
+  static Future<String> determineAddress() async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      final position = await determinePosition();
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
       if (placemarks.isEmpty) return AppStrings.unknownLocation;
 
