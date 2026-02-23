@@ -19,7 +19,8 @@ class TakePhotoScreen extends ConsumerWidget {
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
         child: cameraState.isLoading
-            ?
+            ? 
+              // ---------- LOADING (STATE) ---------- //
               Expanded(
                 flex: 3,
                 child: Container(
@@ -29,6 +30,7 @@ class TakePhotoScreen extends ConsumerWidget {
               )
             : (uiState is CameraReady)
             ?
+              // ---------- CAMERA IS READY (STATE) ---------- //
               Column(
                 children: [
                   CameraPreview(uiState.controller),
@@ -123,7 +125,9 @@ class TakePhotoScreen extends ConsumerWidget {
                 ],
               )
             : (uiState is CameraPermissionDenied)
-            ? Padding(
+            ?
+              // ---------- CAMERA PERMISSIONS ARE DENIED (STATE) ---------- //
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -138,7 +142,9 @@ class TakePhotoScreen extends ConsumerWidget {
                 ),
               )
             : (uiState is CameraFailure)
-            ? Expanded(
+            ?
+              // ---------- FAILURE (STATE) ---------- //
+              Expanded(
                 flex: 2,
                 child: Container(
                   color: AppColors.kPrimary,

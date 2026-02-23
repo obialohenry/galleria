@@ -38,7 +38,7 @@ class CameraControllerProvider extends AsyncNotifier<CameraUiState> {
     return await _initializeCamera(cameras: cameras, cameraIndex: 0);
   }
 
-  ///Returns a new instance of camera state.
+  ///Returns a type of camera ui state (CameraUiState).
   ///
   ///parameters:
   ///-cameras: The list of available cameras from the Camera plugin
@@ -46,7 +46,12 @@ class CameraControllerProvider extends AsyncNotifier<CameraUiState> {
   ///
   ///Disposes of previous camera controller is any.
   ///Creates a new camera controller, a camera item and it's resolution.
-  ///Initializes the controller and returns a new camera state instance using the controller and camera index.
+  ///Initializes the controller and returns a `CameraReady` type using the controller and camera index.
+  ///If a CameraException occurs, it returns a `CameraPermissionDenied` type if the exception code is any of the following:
+  ///- CameraAccessDenied
+  ///- CameraAccessDeniedWithoutPrompt
+  ///- CameraAccessRestricted.
+  ///It then returns a `CameraFailure` type on any other CameraException, or Exceptions.
   Future<CameraUiState> _initializeCamera({
     required List<CameraDescription> cameras,
     required int cameraIndex,
@@ -70,7 +75,7 @@ class CameraControllerProvider extends AsyncNotifier<CameraUiState> {
     }
   }
 
-  ///Switch between front and back cameras.
+  ///Switch between front and back cameras and initialize respective camera, when the state has value, and is of CameraReady type.
   Future<void> switchCamera() async {
     final currentState = state.value;
 
@@ -99,7 +104,8 @@ class CameraControllerProvider extends AsyncNotifier<CameraUiState> {
     }
   }
 
-  ///Take a photo and save it to the Galleria album on the device.
+  //TODO: Re-structure this takePicture method below to handle edgecases properly.
+  ///Take a photo and save it to the Galleria album on the device, when the state has value, and is of CameraReady type.
   Future<File?> takePicture() async {
     final currentState = state.value;
 
