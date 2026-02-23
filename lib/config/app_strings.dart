@@ -29,4 +29,6 @@ class AppStrings {
   static const save = "save";
   static const takeAPhoto = "Take a Photo";
   static const photos = "Photos";
+  static const failedToSaveImageToDeviceGallery = "Failed to Save image to gallery";
+  static const cameraPermissionRequiredToTakePhotos = "Camera permission required to take photos.";
 }

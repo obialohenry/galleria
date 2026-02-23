@@ -179,12 +179,15 @@ class UtilFunctions {
 
   static void copyToClipBoard(BuildContext context, {required String value}) {
     Clipboard.setData(ClipboardData(text: value));
+    toastMessage(context, color: AppColors.kSuccess, message: AppStrings.successfullyCopied);
+  }
 
+  static void toastMessage(BuildContext context, {required Color color, required String message}) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: AppColors.kSuccess,
-        content: AppText(text: AppStrings.successfullyCopied, color: AppColors.kTextSecondary),
+      SnackBar(
+        backgroundColor: color,
+        content: AppText(text: message, color: AppColors.kTextSecondary),
         duration: Duration(seconds: 2),
       ),
     );

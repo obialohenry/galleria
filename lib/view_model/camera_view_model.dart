@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:galleria/model/local/camera_state.dart';
+import 'package:galleria/model/local/camera_ui_state.dart';
 import 'package:galleria/src/package.dart';
 import 'package:galleria/utils/util_functions.dart';
 
@@ -17,20 +17,23 @@ class AvailableCamerasProvider extends AsyncNotifier<List<CameraDescription>> {
   }
 }
 
-final cameraControllerProvider = AsyncNotifierProvider<CameraControllerProvider, CameraState>(
+final cameraControllerProvider = AsyncNotifierProvider<CameraControllerProvider, CameraUiState>(
   CameraControllerProvider.new,
 );
 
-class CameraControllerProvider extends AsyncNotifier<CameraState> {
+class CameraControllerProvider extends AsyncNotifier<CameraUiState> {
   CameraController? _controller;
   AudioPlayer? _player;
   @override
-  FutureOr<CameraState> build() async {
+  FutureOr<CameraUiState> build() async {
     final cameras = await ref.watch(availableCamerasProvider.future);
     ref.onDispose(() {
       _controller?.dispose();
       _player?.dispose();
     });
+    if (cameras.isEmpty) {
+      return CameraFailure("No cameras available");
+    }
 
     return await _initializeCamera(cameras: cameras, cameraIndex: 0);
   }
@@ -44,23 +47,42 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
   ///Disposes of previous camera controller is any.
   ///Creates a new camera controller, a camera item and it's resolution.
   ///Initializes the controller and returns a new camera state instance using the controller and camera index.
-  Future<CameraState> _initializeCamera({
+  Future<CameraUiState> _initializeCamera({
     required List<CameraDescription> cameras,
     required int cameraIndex,
   }) async {
-    await _controller?.dispose();
+    try {
+      await _controller?.dispose();
 
-    _controller = CameraController(cameras[cameraIndex], ResolutionPreset.max);
-    await _controller!.initialize();
-    return CameraState(controller: _controller!, cameraIndex: cameraIndex);
+      _controller = CameraController(cameras[cameraIndex], ResolutionPreset.max);
+      await _controller!.initialize();
+      return CameraReady(controller: _controller!, cameraIndex: cameraIndex);
+    } on CameraException catch (e) {
+      if (e.code == 'CameraAccessDenied' ||
+          e.code == 'CameraAccessDeniedWithoutPrompt' ||
+          e.code == 'CameraAccessRestricted') {
+        return CameraPermissionDenied();
+      }
+
+      return CameraFailure(e.description ?? e.code);
+    } catch (e) {
+      return CameraFailure(e.toString());
+    }
   }
 
   ///Switch between front and back cameras.
   Future<void> switchCamera() async {
+    final currentState = state.value;
+
+    if (currentState == null) return;
+
+    if (currentState is! CameraReady) return;
+
+    final currentIndex = currentState.cameraIndex;
+
     state = const AsyncLoading();
 
     final cameras = await ref.read(availableCamerasProvider.future);
-    final currentIndex = state.value!.cameraIndex;
 
     state = AsyncValue.data(
       await _initializeCamera(cameras: cameras, cameraIndex: (currentIndex + 1) % cameras.length),
@@ -79,13 +101,18 @@ class CameraControllerProvider extends AsyncNotifier<CameraState> {
 
   ///Take a photo and save it to the Galleria album on the device.
   Future<File?> takePicture() async {
-    if (!state.hasValue || _controller == null) {
+    final currentState = state.value;
+
+    if (currentState == null || _controller == null) {
       return null;
     }
 
-    final cameraState = state.value!;
-    if (!cameraState.controller.value.isTakingPicture) {
-      final XFile xFile = await cameraState.controller.takePicture();
+    if (currentState is! CameraReady) {
+      return null;
+    }
+    final cameraController = currentState.controller;
+    if (!cameraController.value.isTakingPicture) {
+      final XFile xFile = await cameraController.takePicture();
       final imageFile = File(xFile.path);
       final success = await UtilFunctions.saveImageToDeviceGallery(file: imageFile);
       if (!success) {

@@ -12,4 +12,5 @@ class AppColors {
   static const kError = Color(0xFFDC2626);
   static const kContentAlert = Color(0xff000000);
   static const kSurfaceAlert = Color(0xffffffff);
+  static const kInactiveColor = Color(0xFF9E9E9E);
 }

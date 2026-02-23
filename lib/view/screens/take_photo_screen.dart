@@ -12,34 +12,46 @@ class TakePhotoScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final camerasProvider = ref.watch(cameraControllerProvider);
+    final cameraState = ref.watch(cameraControllerProvider);
+    final uiState = cameraState.value;
     final photosProvider = ref.watch(photosViewModel);
     return Scaffold(
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
         child: Column(
           children: [
-            camerasProvider.when(
-              loading: () => Expanded(
+            if (cameraState.isLoading)
+              Expanded(
                 flex: 3,
                 child: Container(
                   color: Colors.transparent,
                   child: Center(child: CircularProgressIndicator(color: AppColors.kPrimary)),
                 ),
-              ),
-
-              error: (error, stackTrace) => Expanded(
+              )
+            else if (uiState is CameraReady)
+              CameraPreview(uiState.controller)
+            else if (uiState is CameraPermissionDenied)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.no_photography, color: AppColors.kInactiveColor, size: 20),
+                  SizedBox(height: 15),
+                  AppText(
+                    text: AppStrings.cameraPermissionRequiredToTakePhotos,
+                    color: AppColors.kTextSecondary,
+                  ),
+                ],
+              )
+            else if (uiState is CameraFailure)
+              Expanded(
                 flex: 2,
                 child: Container(
                   color: AppColors.kPrimary,
-                  child: Center(child: AppText(text: error.toString())),
+                  child: Center(child: AppText(text: uiState.message)),
                 ),
               ),
-              data: (cameraState) {
-                return CameraPreview(cameraState.controller);
-              },
-            ),
             Spacer(flex: 1),
+            if (cameraState.hasValue && uiState is CameraReady)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
               child: Row(
@@ -52,9 +64,8 @@ class TakePhotoScreen extends ConsumerWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => PhotoDetailsScreen(
-                                  index: photosProvider.length - 1,
-                                ),
+                                  builder: (context) =>
+                                      PhotoDetailsScreen(index: photosProvider.length - 1),
                               ),
                             );
                           },
@@ -93,7 +104,7 @@ class TakePhotoScreen extends ConsumerWidget {
                                   time: time,
                                   localPath: image.path,
                                   location: address,
-                                  createdAt: DateTime.now()
+                                    createdAt: DateTime.now(),
                                 ),
                               );
                         }
@@ -132,6 +143,7 @@ class TakePhotoScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            // else if (cameraState.hasValue && uiState is CameraPermissionDenied)
           ],
         ),
       ),
