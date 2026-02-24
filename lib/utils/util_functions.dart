@@ -4,6 +4,7 @@ import 'package:galleria/src/config.dart';
 import 'package:galleria/src/package.dart';
 import 'package:galleria/view/components/app_text.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class UtilFunctions {
   static final Dio _dio = Dio();
@@ -225,5 +226,9 @@ class UtilFunctions {
       return false;
     }
     return false;
+  }
+
+  static Future<PermissionStatus> requestCameraPermssion() async {
+    return await Permission.camera.request();
   }
 }

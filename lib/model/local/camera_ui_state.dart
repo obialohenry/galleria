@@ -9,7 +9,11 @@ class CameraReady extends CameraUiState {
   CameraReady({required this.controller, required this.cameraIndex});
 }
 
-class CameraPermissionDenied extends CameraUiState {}
+class CameraPermissionDenied extends CameraUiState {
+  final bool isPermanentlyDenied;
+
+  CameraPermissionDenied({this.isPermanentlyDenied = false});
+}
 
 class CameraFailure extends CameraUiState {
   final String message;

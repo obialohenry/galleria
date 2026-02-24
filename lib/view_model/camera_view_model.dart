@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:galleria/model/local/camera_ui_state.dart';
 import 'package:galleria/src/package.dart';
 import 'package:galleria/utils/util_functions.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final availableCamerasProvider =
     AsyncNotifierProvider<AvailableCamerasProvider, List<CameraDescription>>(
@@ -63,10 +64,12 @@ class CameraControllerProvider extends AsyncNotifier<CameraUiState> {
       await _controller!.initialize();
       return CameraReady(controller: _controller!, cameraIndex: cameraIndex);
     } on CameraException catch (e) {
-      if (e.code == 'CameraAccessDenied' ||
-          e.code == 'CameraAccessDeniedWithoutPrompt' ||
-          e.code == 'CameraAccessRestricted') {
+      if (e.code == 'CameraAccessDenied' || e.code == 'CameraAccessRestricted') {
         return CameraPermissionDenied();
+      }
+
+      if (e.code == 'CameraAccessDeniedWithoutPrompt') {
+        return CameraPermissionDenied(isPermanentlyDenied: true);
       }
 
       return CameraFailure(e.description ?? e.code);
@@ -128,5 +131,18 @@ class CameraControllerProvider extends AsyncNotifier<CameraUiState> {
       return imageFile;
     }
     return null;
+  }
+
+  Future<void> requestCameraPermissionAndChangeUIState() async {
+    final permissionStatus = await UtilFunctions.requestCameraPermssion();
+
+    if (permissionStatus.isGranted) {
+      final cameras = await ref.read(availableCamerasProvider.future);
+      state = AsyncValue.data(await _initializeCamera(cameras: cameras, cameraIndex: 0));
+    } else if (permissionStatus.isDenied) {
+      state = AsyncValue.data(CameraPermissionDenied());
+    } else if (permissionStatus.isPermanentlyDenied) {
+      state = AsyncValue.data(CameraPermissionDenied(isPermanentlyDenied: true));
+    }
   }
 }

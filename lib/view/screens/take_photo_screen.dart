@@ -1,11 +1,12 @@
 import 'dart:io';
+import 'package:galleria/src/components.dart';
 import 'package:galleria/src/config.dart';
 import 'package:galleria/src/model.dart';
 import 'package:galleria/src/package.dart';
 import 'package:galleria/src/screens.dart';
 import 'package:galleria/src/view_model.dart';
 import 'package:galleria/utils/util_functions.dart';
-import 'package:galleria/view/components/app_text.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class TakePhotoScreen extends ConsumerWidget {
   const TakePhotoScreen({super.key});
@@ -19,7 +20,7 @@ class TakePhotoScreen extends ConsumerWidget {
       backgroundColor: AppColors.kBackgroundPrimary,
       body: SafeArea(
         child: cameraState.isLoading
-            ? 
+            ?
               // ---------- LOADING (STATE) ---------- //
               Expanded(
                 flex: 3,
@@ -35,92 +36,92 @@ class TakePhotoScreen extends ConsumerWidget {
                 children: [
                   CameraPreview(uiState.controller),
                   Spacer(flex: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  photosProvider.isEmpty
-                      ? SizedBox(height: 45, width: 45)
-                      : GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      PhotoDetailsScreen(index: photosProvider.length - 1),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        photosProvider.isEmpty
+                            ? SizedBox(height: 45, width: 45)
+                            : GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          PhotoDetailsScreen(index: photosProvider.length - 1),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  height: 45,
+                                  width: 45,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: FileImage(File(photosProvider.last.localPath)),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            );
+                        GestureDetector(
+                          onTap: () async {
+                            try {
+                              final File? image = await ref
+                                  .read(cameraControllerProvider.notifier)
+                                  .takePicture();
+                              if (image != null) {
+                                final date = UtilFunctions.formatDate(DateTime.now());
+                                final time = UtilFunctions.formatTime(DateTime.now());
+                                final address = await UtilFunctions.determineAddress();
+                                ref
+                                    .read(photosViewModel.notifier)
+                                    .updatePhotosList(
+                                      PhotoModel(
+                                        id: const Uuid().v4(),
+                                        date: date,
+                                        time: time,
+                                        localPath: image.path,
+                                        location: address,
+                                        createdAt: DateTime.now(),
+                                      ),
+                                    );
+                              }
+                            } catch (e, s) {
+                              print("An error occured $e at\n$s");
+                            }
+                          },
+                          child: Container(
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(width: 5, color: AppColors.kPrimary),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            ref.read(cameraControllerProvider.notifier).switchCamera();
                           },
                           child: Container(
                             height: 45,
                             width: 45,
+                            alignment: Alignment.center,
                             decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.kTextSecondary),
                               shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: FileImage(File(photosProvider.last.localPath)),
-                                fit: BoxFit.cover,
-                              ),
+                            ),
+                            child: Icon(
+                              Icons.cameraswitch_rounded,
+                              color: AppColors.kTextPrimary,
+                              size: 30,
                             ),
                           ),
                         ),
-                  GestureDetector(
-                    onTap: () async {
-                      try {
-                        final File? image = await ref
-                            .read(cameraControllerProvider.notifier)
-                            .takePicture();
-                        if (image != null) {
-                          final date = UtilFunctions.formatDate(DateTime.now());
-                          final time = UtilFunctions.formatTime(DateTime.now());
-                                final address = await UtilFunctions.determineAddress();
-                          ref
-                              .read(photosViewModel.notifier)
-                              .updatePhotosList(
-                                PhotoModel(
-                                  id: const Uuid().v4(),
-                                  date: date,
-                                  time: time,
-                                  localPath: image.path,
-                                  location: address,
-                                    createdAt: DateTime.now(),
-                                ),
-                              );
-                        }
-                      } catch (e, s) {
-                        print("An error occured $e at\n$s");
-                      }
-                    },
-                    child: Container(
-                      height: 60,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(width: 5, color: AppColors.kPrimary),
-                      ),
+                      ],
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      ref.read(cameraControllerProvider.notifier).switchCamera();
-                    },
-                    child: Container(
-                      height: 45,
-                      width: 45,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.kTextSecondary),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.cameraswitch_rounded,
-                        color: AppColors.kTextPrimary,
-                        size: 30,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
                   ),
                 ],
               )
@@ -138,6 +139,24 @@ class TakePhotoScreen extends ConsumerWidget {
                       text: AppStrings.cameraPermissionRequiredToTakePhotos,
                       color: AppColors.kTextSecondary,
                     ),
+                    SizedBox(height: 50),
+                    Visibility(
+                      visible: uiState.isPermanentlyDenied,
+                      replacement: AppButton(
+                        text: AppStrings.enableCameraPermission,
+                        onTap: () {
+                          ref
+                              .read(cameraControllerProvider.notifier)
+                              .requestCameraPermissionAndChangeUIState();
+                        },
+                      ),
+                      child: AppButton(
+                        text: AppStrings.openAppSettings,
+                        onTap: () {
+                          openAppSettings();
+                        },
+                      ),
+                    ),
                   ],
                 ),
               )
@@ -152,7 +171,7 @@ class TakePhotoScreen extends ConsumerWidget {
                 ),
               )
             : SizedBox.shrink(),
-      )
+      ),
     );
   }
 }
