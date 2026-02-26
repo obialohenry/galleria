@@ -8,11 +8,36 @@ import 'package:galleria/src/view_model.dart';
 import 'package:galleria/utils/util_functions.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class TakePhotoScreen extends ConsumerWidget {
+class TakePhotoScreen extends ConsumerStatefulWidget {
   const TakePhotoScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TakePhotoScreen> createState() => _TakePhotoScreenState();
+}
+
+class _TakePhotoScreenState extends ConsumerState<TakePhotoScreen> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(cameraControllerProvider.notifier).reCheckCameraPermissionStatusandUpdateState();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final cameraState = ref.watch(cameraControllerProvider);
     final uiState = cameraState.value;
     final photosProvider = ref.watch(photosViewModel);
@@ -147,7 +172,7 @@ class TakePhotoScreen extends ConsumerWidget {
                         onTap: () {
                           ref
                               .read(cameraControllerProvider.notifier)
-                              .requestCameraPermissionAndChangeUIState();
+                              .requestCameraPermissionAndUpdateState();
                         },
                       ),
                       child: AppButton(

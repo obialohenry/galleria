@@ -65,17 +65,15 @@ class CameraControllerProvider extends AsyncNotifier<CameraUiState> {
       _controller = CameraController(cameras[cameraIndex], ResolutionPreset.max);
       await _controller!.initialize();
       return CameraReady(controller: _controller!, cameraIndex: cameraIndex);
-    } 
+    }
     // on CameraException catch (e) {
     //   print("CAMERA EXCEPTION: $e");
     //   if (e.code == 'CameraAccessDenied' || e.code == 'CameraAccessRestricted') {
     //     return CameraPermissionDenied();
     //   }
-
     //   if (e.code == 'CameraAccessDeniedWithoutPrompt') {
     //     return CameraPermissionDenied(isPermanentlyDenied: true);
     //   }
-
     //   return CameraFailure(e.description ?? e.code);
     // }
     catch (e) {
@@ -138,8 +136,17 @@ class CameraControllerProvider extends AsyncNotifier<CameraUiState> {
     return null;
   }
 
-  Future<void> requestCameraPermissionAndChangeUIState() async {
+  Future<void> requestCameraPermissionAndUpdateState() async {
     final permissionStatus = await UtilFunctions.requestCameraPermssion();
+    await _updateCameraState(permissionStatus);
+  }
+
+  Future<void> reCheckCameraPermissionStatusandUpdateState() async {
+    final permissionStatus = await UtilFunctions.checkCameraPermissionStatus();
+    await _updateCameraState(permissionStatus);
+  }
+
+  Future<void> _updateCameraState(PermissionStatus permissionStatus) async {
     if (permissionStatus.isGranted) {
       final cameras = await ref.read(availableCamerasProvider.future);
       state = AsyncValue.data(await _initializeCamera(cameras: cameras, cameraIndex: 0));
