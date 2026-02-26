@@ -231,4 +231,8 @@ class UtilFunctions {
   static Future<PermissionStatus> requestCameraPermssion() async {
     return await Permission.camera.request();
   }
+
+  static Future<PermissionStatus> checkCameraPermissionStatus() async {
+    return await Permission.camera.status;
+  }
 }
