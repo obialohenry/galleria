@@ -182,3 +182,6 @@ This app relies on multiple permissions to function correctly:
   - On app startup, the app **scans the Galleria album** and reconciles the images found there with the locally persisted photo metadata stored in Hive.
   - Without this permission, the app cannot correctly load or reconcile previously captured photos.
 
+## Author
+Henry Obialor
+
