@@ -13,7 +13,7 @@ final cloudSyncViewModel = NotifierProvider.autoDispose<CloudSyncViewModel, Phot
   CloudSyncViewModel.new,
 );
 
-class CloudSyncViewModel extends Notifier<PhotoSyncState> {
+class CloudSyncViewModel extends AutoDisposeNotifier<PhotoSyncState> {
   String? _errorMessage;
   @override
   build() {
